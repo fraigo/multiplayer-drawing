@@ -239,6 +239,7 @@ function joinRoom(room){
   })
 
   canvas.addEventListener("touchmove", function (e) {
+    e.preventDefault();
     var originX=e.targetTouches[0].clientX-canvas.offsetLeft;
     var originY=e.targetTouches[0].clientY-canvas.offsetTop;
     var px=originX*1000/canvas.clientWidth;
@@ -268,3 +269,6 @@ function joinRoom(room){
   
 }
 
+window.addEventListener("touchmove",function(ev){
+  ev.preventDefault();
+})

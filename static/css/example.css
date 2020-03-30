@@ -4,6 +4,7 @@ body {
     margin: 0px;
     background-color: #000;
     color: #fff;
+    position: fixed;
 }
 
 body, input, button, select, textarea {

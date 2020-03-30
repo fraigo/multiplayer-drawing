@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- colyseus.js client -->
+    <script type="text/javascript" src="js/colyseus.js"></script>
+    <link rel="stylesheet" href="css/example.css">
+    <title>Multiplayer Game Example</title>
+  </head>
+  <body class="no-selection">
+    <div id="canvas-container">
+      <div id="move-controls" class="btn-container" style="display:none">
+        <div class="btn" id="move-up"><span> </span></div>
+        <div class="btn" id="move-left"><span> </span></div><div class="btn" id="move-right"><span> </span></div>
+        <div class="btn" id="move-down"><span> </span></div>
+      </div>
+      <canvas id="game" width="1000" height="1000" ></canvas>
+      <div id="game-ui">
+        <div class="ui-container">
+            <h3>Select game</h3>
+            <div class="ui-selection">
+            </div>
+        </div>
+      </div>
+    </div>
+    
+    <script src="js/sprites.js"></script>
+    <script src="js/example.js"></script>
+  </body>
+</html>

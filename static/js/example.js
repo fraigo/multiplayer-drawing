@@ -79,6 +79,15 @@ function drawObject(ctx,object){
     ctx.arc(object.x, object.y, object.radius,0, PI2);
     ctx.fill(); 
   }
+  if (object.points.p0 && object.stroke){
+    ctx.strokeStyle=object.stroke;
+    ctx.lineWidth=object.lineWidth;
+    ctx.fillStyle = object.bgcolor;
+    ctx.beginPath();
+    ctx.moveTo(object.points.p0.x, object.points.p0.y);
+    ctx.lineTo(object.points.p1.x, object.points.p1.y);
+    ctx.stroke();
+  }
   if (object.width*object.height && object.bgcolor){
     ctx.fillStyle = object.bgcolor;
     ctx.fillRect(object.x-object.width/2,object.y-object.height/2,object.width,object.height); 

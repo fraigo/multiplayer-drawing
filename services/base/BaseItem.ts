@@ -1,5 +1,7 @@
-import { Schema, type } from "@colyseus/schema";
+import { Schema, type, MapSchema } from "@colyseus/schema";
 import { State } from "./State"
+
+import { Point } from "./Point"
 
 var itemCount = 0;
 
@@ -18,7 +20,16 @@ export class BaseItem extends Schema {
     y = 0;
 
     @type("number")
-    radius = 10;
+    radius = 1;
+
+    @type("string")
+    stroke = "";
+
+    @type("number")
+    lineWidth = 1;
+
+    @type({ map : Point })
+    points = new MapSchema<Point>();
 
     @type("number")
     width = 0;

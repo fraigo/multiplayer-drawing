@@ -7,11 +7,6 @@ import { BaseRoom } from "./base/BaseRoom";
 
 export class ExampleRoom extends BaseRoom<ExampleState> {
     
-    metadata = {
-        opened: false,
-        name: ""
-    }
-
     maxClients = 4;
 
 

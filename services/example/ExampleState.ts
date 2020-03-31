@@ -18,6 +18,14 @@ export class ExampleState extends State {
 
     initPlayer (player: ExamplePlayer){
         console.log("Init player");
+        player.x=20;
+        player.y=30+45*player.index;
+        player.radius=10;
+        player.bgcolor=this.colors[player.index];
+        player.label=player.name;
+        player.labelx=player.x+20;
+        player.labely=player.y+7;
+        player.labelAlign='left';
     }
 
     updatePlayer (id: string, cmd: any) {

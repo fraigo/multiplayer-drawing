@@ -9,8 +9,9 @@ export class BaseRoom<T = State> extends Room<T> {
     
     metadata = {
         opened: false,
-        name: ""
+        name: "",
     }
+    playerName = "";
 
     maxClients = 4;
 
@@ -22,6 +23,7 @@ export class BaseRoom<T = State> extends Room<T> {
         this.roomId =  "g" + (Math.round( Math.random() * 60000) + 4096).toString(16);
         console.log("Created!", options);
         this.metadata.opened = true;
+        this.metadata.name = options.name+"'s room";
         this.start();
     }
 
@@ -30,13 +32,17 @@ export class BaseRoom<T = State> extends Room<T> {
     }
 
     onJoin (client) {
-        this.state.createPlayer(client.sessionId);
+        var name=this.playerName+"";
+        console.log("Player",client.sessionId,name);
+        this.state.createPlayer(client.sessionId, name);
     }
 
     requestJoin (options, isNewRoom: boolean) {
+        console.log("requestJoin",options.id,this.roomId,options.name);
         if (options.id && options.id!=this.roomId){
             return false;
         }
+        this.playerName = options.name;
         return (options.create)
             ? (options.create && isNewRoom)
             : this.clients.length > 0 && this.metadata.opened;

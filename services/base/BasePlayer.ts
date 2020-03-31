@@ -8,6 +8,9 @@ export class BasePlayer extends BaseItem {
     @type({ map: BaseItem})
     items = new MapSchema<BaseItem>();
 
+    @type("string")
+    name = "Player"
+
     update = function(state:State){
         
     }

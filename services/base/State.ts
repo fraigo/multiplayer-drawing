@@ -25,7 +25,7 @@ export class State extends GameState {
     last_time = this.time;
     diff = 0;
     
-    createPlayer (id: string) {
+    createPlayer (id: string, name: string) {
         if (this.state == this.STATE_FINISH){
             return;
         }
@@ -42,6 +42,7 @@ export class State extends GameState {
         }
         var newItem = new BasePlayer();
         newItem.index =  index;
+        newItem.name = name;
         this.players[id] = newItem;
         this.playerSlots[index] = true;
         this.playerCount++;

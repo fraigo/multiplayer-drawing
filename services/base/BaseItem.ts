@@ -43,6 +43,15 @@ export class BaseItem extends Schema {
     @type("string")
     label = "";
 
+    @type("int16")
+    labelx = 0;
+
+    @type("int16")
+    labely = 0;
+
+    @type("string")
+    labelAlign = null;
+
     @type("string")
     type = "item";
 

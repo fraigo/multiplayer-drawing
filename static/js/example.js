@@ -3,6 +3,7 @@ var canvas = document.getElementById("game");
 var host = window.document.location.host.replace(/:.*/, '');
 var client = new Colyseus.Client(location.protocol.replace("http", "ws") + host + (location.port ? ':' + location.port : ''));
 var currentRoom = '';
+var userName = '';
 var PI2=2*Math.PI;
 
 client.onOpen.add(function() {
@@ -22,6 +23,22 @@ for (var id in sprites){
   }
   img.src="/"+sprites[id].file;
   sprites[id].image = img;
+}
+
+function ucFirst(text){
+  return text.substring(0,1).toUpperCase()+text.substring(1);
+}
+
+function changeUsername(user){
+  var step2=document.getElementById("step2");
+  userName = '';
+  if (user.value.trim()!=""){
+    step2.style.display='';
+    userName = ucFirst(user.value.trim());
+  }else{
+    step2.style.display='none';
+  }
+
 }
 
 function showRooms(){
@@ -45,13 +62,13 @@ function showRooms(){
 var currentRoom;
 
 function createGame(){
-  currentRoom= client.join("example",{create:true})
+  currentRoom= client.join("example",{create:true,name:userName})
   joinRoom(currentRoom)
   document.querySelector("#game-ui").style.display='none'
 }
 
 function selectGame(id){
-  currentRoom= client.join("example",{id:id})
+  currentRoom= client.join("example",{id:id,name:userName})
   joinRoom(currentRoom)
   document.querySelector("#game-ui").style.display='none'
 }
@@ -108,8 +125,10 @@ function drawObject(ctx,object){
   if (object.label){
     ctx.fillStyle = "#000";
     ctx.font = object.fontSize + "px Arial";
-    ctx.textAlign = "center";
-    ctx.fillText(object.label, object.x, object.y-w/2-4);  
+    ctx.textAlign = object.labelAlign?object.labelAlign:'center';
+    var lx=object.labelx?object.labelx:object.x;
+    var ly=object.labely?object.labely:(object.y-w/2-4);
+    ctx.fillText(object.label, lx, ly);  
   }
 }
 
@@ -173,7 +192,7 @@ function joinRoom(room){
     // listen to patches coming from the server
     room.state.players.onAdd = function(player, sessionId) {
       players[sessionId] = player;
-      console.log("Player",player.id, sessionId);
+      console.log("Player",player.id, sessionId, player.name);
       if (room.sessionId == sessionId){
         myPlayer = player;
       }

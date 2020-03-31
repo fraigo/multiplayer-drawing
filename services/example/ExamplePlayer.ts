@@ -11,7 +11,7 @@ export class ExamplePlayer extends BasePlayer {
 
     @type("int16")
     y0 = 0;
-    
+
     update = function(state:ExampleState){
         
     }

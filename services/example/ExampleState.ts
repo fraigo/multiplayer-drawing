@@ -16,6 +16,8 @@ export class ExampleState extends State {
         "#c0c"
     ]
 
+    currentId = '';
+
     initPlayer (player: ExamplePlayer){
         console.log("Init player");
         player.x=20;
@@ -26,11 +28,17 @@ export class ExampleState extends State {
         player.labelx=player.x+20;
         player.labely=player.y+7;
         player.labelAlign='left';
+        if (this.currentId==''){
+            this.nextPlayer();
+        }
     }
 
     updatePlayer (id: string, cmd: any) {
         var player=this.players[id];
         //console.log("Update player",player.index, cmd.type);
+        if (id!=this.currentId){
+            return;
+        }
         if (cmd.type=="touch"){
             console.log("touch",cmd.px,cmd.py);
             var item=new BaseItem();
@@ -77,6 +85,34 @@ export class ExampleState extends State {
                 bgcolor: this.colors[player.index]
             });
             this.items[item.id]=item;    
+            this.nextPlayer();
+        }
+    }
+
+    nextPlayer (){
+        var ids=Object.keys(this.players);
+        console.log("Next",ids,this.currentId);
+        if (this.currentId==''){
+            this.currentId=ids[0];
+        }else{
+            var pos=ids.indexOf(this.currentId)+1;
+            if (pos>=ids.length){
+                this.currentId=ids[0];
+            }else{
+                this.currentId=ids[pos];
+            }    
+        }
+        for(var p in this.players){
+            this.players[p].label=this.players[p].name;
+        }
+        this.players[this.currentId].label=this.players[p].name+" <<";
+        return this.currentId;
+    }
+
+    removePlayer (id: string) {
+        super.removePlayer(id);
+        if (this.currentId==id){
+            this.nextPlayer();
         }
     }
 

@@ -11,6 +11,8 @@ export class BasePlayer extends BaseItem {
     @type("string")
     name = "Player"
 
+    client = null;
+
     update = function(state:State){
         
     }

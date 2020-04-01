@@ -7,9 +7,7 @@ import { BaseRoom } from "./base/BaseRoom";
 
 export class ExampleRoom extends BaseRoom<ExampleState> {
     
-    maxClients = 4;
-
-
+    maxClients = 6;
 
     start(){
         console.log("Started");

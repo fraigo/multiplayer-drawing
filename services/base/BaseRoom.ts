@@ -34,7 +34,7 @@ export class BaseRoom<T = State> extends Room<T> {
     onJoin (client) {
         var name=this.playerName+"";
         console.log("Player",client.sessionId,name);
-        this.state.createPlayer(client.sessionId, name);
+        this.state.createPlayer(client.sessionId, name, client);
     }
 
     requestJoin (options, isNewRoom: boolean) {

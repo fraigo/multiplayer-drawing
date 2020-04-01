@@ -64,18 +64,21 @@ var currentRoom;
 function createGame(){
   currentRoom= client.join("example",{create:true,name:userName})
   joinRoom(currentRoom)
+  document.title=userName;
   document.querySelector("#game-ui").style.display='none'
 }
 
 function selectGame(id){
   currentRoom= client.join("example",{id:id,name:userName})
   joinRoom(currentRoom)
+  document.title=userName;
   document.querySelector("#game-ui").style.display='none'
 }
 
 function sendIdleKey(room){
-  //room.send({idle:1})
-  //window.setTimeout(sendIdleKey,30,room);
+  console.log("Idle");
+  room.send({idle:1})
+  window.setTimeout(sendIdleKey,1000,room);
 }
 
 function drawSprite(ctx,sp,sx,sy,bounds,ox,oy){

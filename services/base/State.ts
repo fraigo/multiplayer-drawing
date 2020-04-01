@@ -25,7 +25,7 @@ export class State extends GameState {
     last_time = this.time;
     diff = 0;
     
-    createPlayer (id: string, name: string) {
+    createPlayer (id: string, name: string, client: any) {
         if (this.state == this.STATE_FINISH){
             return;
         }
@@ -41,6 +41,7 @@ export class State extends GameState {
             }
         }
         var newItem = new BasePlayer();
+        newItem.client = client;
         newItem.index =  index;
         newItem.name = name;
         this.players[id] = newItem;
@@ -55,6 +56,7 @@ export class State extends GameState {
     }
 
     removePlayer (id: string) {
+        console.log("Removed",id);
         if (!this.players[id]){
             return;
         }
@@ -64,7 +66,7 @@ export class State extends GameState {
     }
 
     updatePlayer (id: string, cmd: any) {
-
+        
     }
 
 

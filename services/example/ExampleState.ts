@@ -13,11 +13,13 @@ export class ExampleState extends State {
         "#c00",
         "#0c0",
         "#00c",
-        "#c0c"
+        "#c0c",
+        "#0cc",
+        "#8c0"
     ]
 
     currentId = '';
-
+    
     initPlayer (player: ExamplePlayer){
         console.log("Init player");
         player.x=20;
@@ -105,7 +107,8 @@ export class ExampleState extends State {
         for(var p in this.players){
             this.players[p].label=this.players[p].name;
         }
-        this.players[this.currentId].label=this.players[p].name+" <<";
+        var player = this.players[this.currentId];
+        player.label=this.players[this.currentId].name+" <<";
         return this.currentId;
     }
 

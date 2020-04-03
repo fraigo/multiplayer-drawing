@@ -19,40 +19,77 @@ export class ExampleState extends State {
     ]
 
     currentId = '';
+
+    start(){
+        this.square(0,0,150,200,"#eeec");
+    }
     
     initPlayer (player: ExamplePlayer){
         console.log("Init player");
-        player.x=20;
-        player.y=30+45*player.index;
-        player.radius=10;
-        player.bgcolor=this.colors[player.index];
-        player.label=player.name;
-        player.labelx=player.x+20;
-        player.labely=player.y+7;
-        player.labelAlign='left';
-        if (this.currentId==''){
+        var item=new BaseItem();
+        item.radius=10;
+        item.x=20;
+        item.bgcolor=this.colors[player.index];
+        item.label=player.name;
+        item.labelx=item.x+20;
+        item.labelAlign='left';
+        if (this.playerCount==1){
+            item.label += " ";
+        }
+        this.ui["player"+player.UUID]=item;
+        this.updatePlayerUi();
+        console.log("Current",this.currentId,Object.keys(this.ui));
+        if (this.currentId=='' && this.playerCount>1){
             this.nextPlayer();
         }
+    }
+
+    square(px:number,py:number, width:number, height:number, bg: string){
+        var item=new BaseItem();
+        item.init({
+            x:px+width/2,
+            y:py+height/2,
+            width: width,
+            height: height,
+            radius: 0,
+            bgcolor: bg
+        });
+        this.ui["square"]=item;
+
+    }
+
+    drawItem(px: number,py: number,player: ExamplePlayer){
+        var item=new BaseItem();
+            item.init({
+                x:px,
+                y:py,
+                radius: 5,
+                bgcolor: player.bgcolor
+            });
+        this.items[item.id]=item;
     }
 
     updatePlayer (id: string, cmd: any) {
         var player=this.players[id];
         //console.log("Update player",player.index, cmd.type);
+        if (cmd.type=="notified"){
+            player.notify();
+        }
+        if (cmd.idle==1){
+            return;
+        }
+        if (cmd.type=="move"){
+            return;
+        }
         if (id!=this.currentId){
             return;
         }
         if (cmd.type=="touch"){
             console.log("touch",cmd.px,cmd.py);
-            var item=new BaseItem();
-            item.init({
-                x:cmd.px,
-                y:cmd.py,
-                radius: 5,
-                bgcolor: this.colors[player.index]
-            });
+            this.drawItem(cmd.px,cmd.py,player);
             player.x0=cmd.px;
             player.y0=cmd.py;
-            this.items[item.id]=item;    
+                
         }
         if (cmd.type=="drag"){
             var item=new BaseItem();
@@ -79,14 +116,8 @@ export class ExampleState extends State {
             this.items[item.id]=item;    
         }
         if (cmd.type=="release"){
-            var item=new BaseItem();
-            item.init({
-                x:cmd.px,
-                y:cmd.py,
-                radius: 5,
-                bgcolor: this.colors[player.index]
-            });
-            this.items[item.id]=item;    
+            console.log("release",cmd.px,cmd.py);
+            this.drawItem(cmd.px,cmd.py,player);   
             this.nextPlayer();
         }
     }
@@ -104,18 +135,45 @@ export class ExampleState extends State {
                 this.currentId=ids[pos];
             }    
         }
-        for(var p in this.players){
-            this.players[p].label=this.players[p].name;
-        }
-        var player = this.players[this.currentId];
-        player.label=this.players[this.currentId].name+" <<";
+        this.updatePlayerUi();
+        var player = this.getPlayer(this.currentId);
+        player.notify("It's your turn");
+        console.log("notify",player.name);        
         return this.currentId;
     }
 
+    updatePlayerUi(){
+        var idx=0;
+        console.log(Object.keys(this.ui));
+        for(var p in this.players){
+            var pl = this.players[p];
+            var plui = this.ui["player"+pl.UUID];
+            plui.label=pl.name;
+            plui.y=30+45*idx;
+            plui.labely=plui.y+8;
+            idx++;
+        }
+        if (this.currentId!=''){
+            var player = this.getPlayer(this.currentId);
+            if (player){
+                this.ui["player"+player.UUID].label=this.players[this.currentId].name+" <<";
+            }
+        }
+    }
+
+    getPlayer (id:string) : ExamplePlayer{
+        return this.players[id];
+    }
+
     removePlayer (id: string) {
+        var player=this.players[id];
+        delete this.ui["player"+player.UUID];
         super.removePlayer(id);
+        this.updatePlayerUi();
         if (this.currentId==id){
             this.nextPlayer();
+        }else{
+
         }
     }
 

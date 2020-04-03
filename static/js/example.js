@@ -3,8 +3,12 @@ var canvas = document.getElementById("game");
 var host = window.document.location.host.replace(/:.*/, '');
 var client = new Colyseus.Client(location.protocol.replace("http", "ws") + host + (location.port ? ':' + location.port : ''));
 var currentRoom = '';
+var currentSession = '';
 var userName = '';
 var PI2=2*Math.PI;
+
+var playerName = document.getElementById("playername");
+playerName.focus();
 
 client.onOpen.add(function() {
   document.querySelector("#game-ui").style.display='';
@@ -139,8 +143,10 @@ function joinRoom(room){
   
   var players = {};
   var myPlayer;
+  var lastNotification = 0;
 
   var items = [];
+  var ui = [];
   var PI2 = 2* Math.PI;
   
   var KEY_LEFT = 37;
@@ -161,7 +167,6 @@ function joinRoom(room){
   var ctx = canvas.getContext("2d");
 
   function drawObjects(){
-    //window.PREV_DRAW = window.LAST_DRAW;
     window.LAST_DRAW = (new Date()).getTime();
     ctx.fillStyle = "#fff";
     ctx.fillRect(0,0,1000,1000);
@@ -173,6 +178,11 @@ function joinRoom(room){
     }
     for(var $index in players){
       var object = players[$index];
+      drawObject(ctx,object);
+    }
+    for(var $index in ui){
+      console.log("UI",$index);
+      var object = ui[$index];
       drawObject(ctx,object);
     }
     ctx.fillStyle = "#fff";
@@ -189,7 +199,8 @@ function joinRoom(room){
 
 
   room.onJoin.add(function() {
-    console.log("Joined to game",room);
+    console.log("Joined to game",room.id, room.name, room.sessionId);
+    currentSession = room.sessionId;
     sendIdleKey(room);
 
     // listen to patches coming from the server
@@ -207,12 +218,43 @@ function joinRoom(room){
       items.push(item);
       triggerDraw();
     }
-  
+
+    room.state.items.onChange = function (item, sessionId) {
+      triggerDraw();
+    }
+
+    room.state.ui.onAdd = function(item, sessionId) {
+      
+      ui.push(item);
+      triggerDraw();
+    }
+
+    room.state.ui.onChange = function (item, sessionId) {
+      triggerDraw();
+    }
+
+    room.state.ui.onRemove = function(item, sessionId) {
+      var pos=ui.indexOf(item);
+      ui.splice(pos,1);
+      triggerDraw();
+    }
+
     room.state.players.onRemove = function(player, sessionId) {
       delete players[sessionId];
+      triggerDraw();
     }
   
     room.state.players.onChange = function (player, sessionId) {
+      if (player.notificationId!=lastNotification && player.notification!='' && sessionId==currentSession){
+        var notif=player.notification;
+        lastNotification=player.notificationId;
+        room.send({
+          type:'notified',
+          id: lastNotification
+        })
+        console.log("Notify",notif);
+        console.log(players);
+      }
       triggerDraw();
     }
   })
@@ -288,6 +330,13 @@ function joinRoom(room){
 
   canvas.addEventListener("touchend", function (e) {
     touchStarted=false;
+    var px=e.offsetX*1000/canvas.clientWidth;
+    var py=e.offsetY*1000/canvas.clientHeight;
+    room.send({
+      type:'release',
+      px:px,
+      py:py
+    })
   })
   
   

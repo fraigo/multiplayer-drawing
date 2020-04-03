@@ -5,6 +5,7 @@ body {
     background-color: #000;
     color: #fff;
     position: fixed;
+    width: 100%;
 }
 
 body, input, button, select, textarea {
@@ -43,12 +44,18 @@ body, input, button, select, textarea {
     display: inline-block;
 }
 
-#game-ui button{
+#game-ui button,#game-ui input{
     line-height: 32px;
     border: 0px;
-    background-color: rgba(255,255,255,0.8);
+    background-color: rgba(255,255,255,1.0);
     display:block;
+    font-size: 18px;
     width:100%;
+    border-radius: 3px;
+    text-align: center;
+}
+#game-ui button{
+    background-color: rgba(255,255,255,0.8);
     margin-bottom: 6px;
 }
 

@@ -10,6 +10,8 @@ export class State extends GameState {
     players = new MapSchema<BasePlayer>();
     @type({ map: BaseItem })
     items = new MapSchema<BaseItem>();
+    @type({ map: BaseItem })
+    ui = new MapSchema<BaseItem>();
 
     STATE_START = 0;
     STATE_PLAYING = 1;
@@ -40,15 +42,21 @@ export class State extends GameState {
                 break;
             }
         }
+        this.start();
         var newItem = new BasePlayer();
         newItem.client = client;
         newItem.index =  index;
+        newItem.UUID =  id;
         newItem.name = name;
         this.players[id] = newItem;
         this.playerSlots[index] = true;
         this.playerCount++;
         console.log("New player idx:",index," count:",this.playerCount);
         this.initPlayer(newItem);
+    }
+
+    start(){
+
     }
 
     initPlayer (player: BasePlayer){

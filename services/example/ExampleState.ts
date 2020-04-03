@@ -21,7 +21,7 @@ export class ExampleState extends State {
     currentId = '';
 
     start(){
-        this.square(0,0,150,200,"#eeec");
+        this.square(0,0,160,200,"#eeec");
     }
     
     initPlayer (player: ExamplePlayer){
@@ -31,7 +31,7 @@ export class ExampleState extends State {
         item.x=20;
         item.bgcolor=this.colors[player.index];
         item.label=player.name;
-        item.labelx=item.x+20;
+        item.labelx=20;
         item.labelAlign='left';
         if (this.playerCount==1){
             item.label += " ";
@@ -150,7 +150,7 @@ export class ExampleState extends State {
             var plui = this.ui["player"+pl.UUID];
             plui.label=pl.name;
             plui.y=30+45*idx;
-            plui.labely=plui.y+8;
+            plui.labely=8;
             idx++;
         }
         if (this.currentId!=''){

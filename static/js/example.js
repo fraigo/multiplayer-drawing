@@ -133,9 +133,9 @@ function drawObject(ctx,object){
     ctx.fillStyle = "#000";
     ctx.font = object.fontSize + "px Arial";
     ctx.textAlign = object.labelAlign?object.labelAlign:'center';
-    var lx=object.labelx?object.labelx:object.x;
-    var ly=object.labely?object.labely:(object.y-w/2-4);
-    ctx.fillText(object.label, lx, ly);  
+    var lx=object.labelx?object.labelx:0;
+    var ly=object.labely?object.labely:(-w/2-4);
+    ctx.fillText(object.label, object.x+lx, object.y+ly);  
   }
 }
 

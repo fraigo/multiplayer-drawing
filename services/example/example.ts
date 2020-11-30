@@ -1,8 +1,8 @@
 import { Room } from "colyseus";
 
-import { Config } from "./base/Config";
-import { ExampleState } from "./example/ExampleState";
-import { BaseRoom } from "./base/BaseRoom";
+import { Config } from "../base/Config";
+import { ExampleState } from "./ExampleState";
+import { BaseRoom } from "../base/BaseRoom";
 
 
 export class ExampleRoom extends BaseRoom<ExampleState> {

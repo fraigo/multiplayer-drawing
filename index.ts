@@ -5,7 +5,7 @@ import { Server } from 'colyseus';
 import { monitor } from '@colyseus/monitor';
 
 // Import demo room handlers
-import { ExampleRoom } from "./services/example";
+import { ExampleRoom } from "./services/example/example";
 
 const port = Number(process.env.PORT || 2567);
 const app = express();

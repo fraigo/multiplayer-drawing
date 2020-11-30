@@ -22,6 +22,9 @@ export class BaseItem extends Schema {
     @type("number")
     radius = 1;
 
+    @type("number")
+    borderRadius = 0;
+
     @type("string")
     stroke = "";
 

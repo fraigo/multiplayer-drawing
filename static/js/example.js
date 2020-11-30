@@ -91,6 +91,41 @@ function drawSprite(ctx,sp,sx,sy,bounds,ox,oy){
   ctx.drawImage(sp.image,sp.width*sx,sp.height*sy,sp.width,sp.height,ox+bounds.x-w1/2,oy+bounds.y-w1/2,w1,h1);
 }
 
+function roundRect(ctx, x, y, width, height, radius, fill, stroke) {
+  if (typeof stroke === 'undefined') {
+    stroke = true;
+  }
+  if (typeof radius === 'undefined') {
+    radius = 5;
+  }
+  if (typeof radius === 'number') {
+    radius = {tl: radius, tr: radius, br: radius, bl: radius};
+  } else {
+    var defaultRadius = {tl: 0, tr: 0, br: 0, bl: 0};
+    for (var side in defaultRadius) {
+      radius[side] = radius[side] || defaultRadius[side];
+    }
+  }
+  ctx.beginPath();
+  ctx.moveTo(x + radius.tl, y);
+  ctx.lineTo(x + width - radius.tr, y);
+  ctx.quadraticCurveTo(x + width, y, x + width, y + radius.tr);
+  ctx.lineTo(x + width, y + height - radius.br);
+  ctx.quadraticCurveTo(x + width, y + height, x + width - radius.br, y + height);
+  ctx.lineTo(x + radius.bl, y + height);
+  ctx.quadraticCurveTo(x, y + height, x, y + height - radius.bl);
+  ctx.lineTo(x, y + radius.tl);
+  ctx.quadraticCurveTo(x, y, x + radius.tl, y);
+  ctx.closePath();
+  if (fill) {
+    ctx.fill();
+  }
+  if (stroke) {
+    ctx.stroke();
+  }
+
+}
+
 function drawObject(ctx,object){
   ctx.beginPath();
   if (!object.visible){
@@ -114,7 +149,7 @@ function drawObject(ctx,object){
   }
   if (object.width*object.height && object.bgcolor){
     ctx.fillStyle = object.bgcolor;
-    ctx.fillRect(object.x-object.width/2,object.y-object.height/2,object.width,object.height); 
+    roundRect(ctx,object.x-object.width/2,object.y-object.height/2,object.width,object.height,object.borderRadius?object.borderRadius:0,object.bgcolor,object.stroke); 
   }
   if (object.sprite && sprites[object.sprite]){
     var sp=sprites[object.sprite];
@@ -134,7 +169,7 @@ function drawObject(ctx,object){
     ctx.font = object.fontSize + "px Arial";
     ctx.textAlign = object.labelAlign?object.labelAlign:'center';
     var lx=object.labelx?object.labelx:0;
-    var ly=object.labely?object.labely:(-w/2-4);
+    var ly=object.labely?object.labely:(h/5);
     ctx.fillText(object.label, object.x+lx, object.y+ly);  
   }
 }
@@ -181,7 +216,7 @@ function joinRoom(room){
       drawObject(ctx,object);
     }
     for(var $index in ui){
-      console.log("UI",$index);
+      //console.log("UI",$index);
       var object = ui[$index];
       drawObject(ctx,object);
     }

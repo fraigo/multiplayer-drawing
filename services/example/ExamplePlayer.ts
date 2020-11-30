@@ -12,6 +12,9 @@ export class ExamplePlayer extends BasePlayer {
     @type("int16")
     y0 = 0;
 
+    @type("string")
+    selected = "";
+
     update = function(state:ExampleState){
         
     }

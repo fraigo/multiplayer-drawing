@@ -1,4 +1,5 @@
 import { type, MapSchema } from "@colyseus/schema";
+import { BaseItem } from "../base/BaseItem";
 import { BasePlayer } from "../base/BasePlayer";
 import { Config } from "../base/Config"
 
@@ -14,6 +15,9 @@ export class ExamplePlayer extends BasePlayer {
 
     @type("string")
     selected = "";
+
+    @type("string")
+    brushColor = "#000";
 
     update = function(state:ExampleState){
         

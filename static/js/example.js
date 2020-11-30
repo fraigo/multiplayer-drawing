@@ -126,16 +126,22 @@ function roundRect(ctx, x, y, width, height, radius, fill, stroke) {
 
 }
 
-function drawObject(ctx,object){
+function drawObject(ctx,object,dx,dy){
   ctx.beginPath();
   if (!object.visible){
     return;
+  }
+  if (!dx){
+    dx=0;
+  }
+  if (!dy){
+    dy=0;
   }
   var w=object.width?object.width:object.radius*2;
   var h=object.height?object.height:object.radius*2;
   if (object.radius && object.bgcolor){
     ctx.fillStyle = object.bgcolor;
-    ctx.arc(object.x, object.y, object.radius,0, PI2);
+    ctx.arc(dx+object.x, dy+object.y, object.radius,0, PI2);
     ctx.fill(); 
   }
   if (object.points.p0 && object.stroke){
@@ -143,25 +149,24 @@ function drawObject(ctx,object){
     ctx.lineWidth=object.lineWidth;
     ctx.fillStyle = object.bgcolor;
     ctx.beginPath();
-    ctx.moveTo(object.points.p0.x, object.points.p0.y);
-    ctx.lineTo(object.points.p1.x, object.points.p1.y);
+    ctx.moveTo(dx+object.points.p0.x, dy+object.points.p0.y);
+    ctx.lineTo(dx+object.points.p1.x, dy+object.points.p1.y);
     ctx.stroke();
   }
   if (object.width*object.height && object.bgcolor){
     ctx.fillStyle = object.bgcolor;
-    roundRect(ctx,object.x-object.width/2,object.y-object.height/2,object.width,object.height,object.borderRadius?object.borderRadius:0,object.bgcolor,object.stroke); 
+    roundRect(ctx,dx+object.x-object.width/2,dy+object.y-object.height/2,object.width,object.height,object.borderRadius?object.borderRadius:0,object.bgcolor,object.stroke); 
   }
   if (object.sprite && sprites[object.sprite]){
     var sp=sprites[object.sprite];
     var w1=w;
     var h1=sp.height*(w/sp.width);
-    drawSprite(ctx,sp,object.spriteX,object.spriteY,object,0,0);
+    drawSprite(ctx,sp,object.spriteX,object.spriteY,object,dx,dy);
   }
   if (object.items){
     for(var idx in object.items){
       var obj=object.items[idx];
-      var sp=sprites[obj.sprite];
-      drawSprite(ctx,sp,obj.spriteX,obj.spriteY,obj,object.x,object.y);  
+      drawObject(ctx,obj,dx+object.x,dy+object.y);
     }
   }
   if (object.label){
@@ -170,7 +175,7 @@ function drawObject(ctx,object){
     ctx.textAlign = object.labelAlign?object.labelAlign:'center';
     var lx=object.labelx?object.labelx:0;
     var ly=object.labely?object.labely:(h/5);
-    ctx.fillText(object.label, object.x+lx, object.y+ly);  
+    ctx.fillText(object.label, dx+object.x+lx, dy+object.y+ly);  
   }
 }
 

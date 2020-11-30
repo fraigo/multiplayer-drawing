@@ -100,8 +100,19 @@ export class BaseItem extends Schema {
         return false;
     }
 
-    collisionWith = function(item:BaseItem){
-
+    collisionWithPoint = function(px:number,py:number){
+        var radius=Math.max(this.width,this.height)/2;
+        if (!this.visible){
+            return false;
+        }
+        if (this.radius){
+            radius = this.radius;
+        }
+        if (radius){
+            var dist2=(this.x-px)*(this.x-px)+(this.y-py)*(this.y-py);
+            return dist2<radius*radius;
+        }
+        return false;
     }
 
     update = function(state:State){

@@ -18,6 +18,21 @@ export class ExampleState extends State {
         "#8c0"
     ]
 
+    palette = [
+        "#000",
+        "#A00",
+        "#080",
+        "#00A",
+        "#620",
+        "#e72",
+        "#fd3",
+        "#8ce",
+        "#7ca",
+        "#fcc",
+        "#aaa",
+        "#fff",
+    ]
+
     currentId = '';
 
     word : string = "testing";
@@ -52,10 +67,9 @@ export class ExampleState extends State {
             const pos1 = (80*idx)+30;
             this.square("sel"+idx,pos1,900,60,80,"#fff",10,this.selLetters[idx]);
         }
-        for(idx in this.realLetters){
-            const pos1 = (80*idx)+30+(12-this.realLetters.length)*40;
-            this.currentLetters[pos1]="";
-            this.square("letter"+idx,pos1,800,60,80,"#eee",10,"");
+        for(idx in this.palette){
+            const pos1 = (60*idx)+30;
+            this.square("color"+idx,900,pos1,60,60,this.palette[idx],10,"");
         }
         console.log(this.selLetters);
     }
@@ -72,6 +86,20 @@ export class ExampleState extends State {
         if (this.playerCount==1){
             item.label += " ";
         }
+        let idx : any = 0;
+        for(idx in this.realLetters){
+            const pos1 = (80*idx)+30+(12-this.realLetters.length)*40;
+            player.items["sel"+idx]=this.item({
+                x:pos1,
+                y:830,
+                width: 60,
+                height: 80,
+                borderRadius: 8,
+                bgcolor: '#fff',
+                label: "",
+                fontSize: 40
+            })
+        }
         this.ui["player"+player.UUID]=item;
         this.updatePlayerUi();
         //console.log("Current",this.currentId,Object.keys(this.ui));
@@ -80,10 +108,14 @@ export class ExampleState extends State {
         }
     }
 
+    item(options: any): BaseItem{
+        let item=new BaseItem();
+        item.init(options);
+        return item;
+    }
+
     square(id: string, px:number,py:number, width:number, height:number, bgcolor: string, bradius:number, label: string): BaseItem{
-        var item=new BaseItem();
-        console.log(px,py,width,height);
-        item.init({
+        let item=this.item({
             x:px+width/2,
             y:py+height/2,
             width: width,
@@ -93,7 +125,7 @@ export class ExampleState extends State {
             bgcolor: bgcolor,
             label: label,
             fontSize: 40
-        });
+        })
         this.ui[id]=item;
         return item;
     }
@@ -104,7 +136,7 @@ export class ExampleState extends State {
                 x:px,
                 y:py,
                 radius: 5,
-                bgcolor: player.bgcolor
+                bgcolor: player.brushColor
             });
         this.items[item.id]=item;
     }
@@ -124,6 +156,33 @@ export class ExampleState extends State {
         if (id==this.currentId){
             player.selected=this.word;
             if (cmd.type=="touch"){
+                let idx : any;
+                let item : BaseItem = null;
+                for(idx in this.palette){
+                    let myItem : BaseItem = this.ui["color"+idx];
+                    myItem.label = "";
+                    console.log(idx, myItem.bgcolor, myItem.x, myItem.y);
+                    if (myItem.collisionWithPoint(cmd.px,cmd.py)){
+                        item = myItem;
+                        console.log("click", myItem.bgcolor );
+                        player.brushColor=myItem.bgcolor;
+                        myItem.label = "o";
+                        player.x0=-1;
+                        player.y0=-1;
+                    }
+                }
+                if (item!=null){
+                    return;
+                }
+                for(idx in this.selLetters){
+                    let myItem : BaseItem = player.items["sel"+idx];
+                    console.log('check letter',myItem.label);
+                    if (myItem && myItem.collisionWithPoint(cmd.px,cmd.py)){
+                        item = myItem;
+                        console.log("press",item.label);
+                    }
+                }
+        
                 console.log("touch",cmd.px,cmd.py);
                 this.drawItem(cmd.px,cmd.py,player);
                 player.x0=cmd.px;
@@ -131,33 +190,37 @@ export class ExampleState extends State {
                     
             }
             if (cmd.type=="drag"){
-                var item=new BaseItem();
-                item.init({
-                    x:cmd.px,
-                    y:cmd.py,
-                    stroke: this.colors[player.index],
-                    radius: 5,
-                    lineWidth: 10,
-                    bgcolor: this.colors[player.index]
-                });
-                var p0=new Point();
-                p0.x=player.x0;
-                p0.y=player.y0;
-                var p1=new Point();
-                p1.x=cmd.px;
-                p1.y=cmd.py;
-                player.x0=cmd.px;
-                player.y0=cmd.py;
+                if (player.x0>=0){
+                    var item=new BaseItem();
+                    item.init({
+                        x:cmd.px,
+                        y:cmd.py,
+                        stroke: player.brushColor,
+                        radius: 5,
+                        lineWidth: 10,
+                        bgcolor: player.brushColor
+                    });
+                    var p0=new Point();
+                    p0.x=player.x0;
+                    p0.y=player.y0;
+                    var p1=new Point();
+                    p1.x=cmd.px;
+                    p1.y=cmd.py;
+                    player.x0=cmd.px;
+                    player.y0=cmd.py;
 
-                item.points["p0"]=p0;
-                item.points["p1"]=p1;
+                    item.points["p0"]=p0;
+                    item.points["p1"]=p1;
 
-                this.items[item.id]=item;    
+                    this.items[item.id]=item;    
+                }
             }
             if (cmd.type=="release"){
-                console.log("release",cmd.px,cmd.py);
-                this.drawItem(cmd.px,cmd.py,player);   
-                this.nextPlayer();
+                if (player.x0>=0){
+                    console.log("release",cmd.px,cmd.py);
+                    this.drawItem(cmd.px,cmd.py,player);   
+                    this.nextPlayer();    
+                }
             }
         }
     }

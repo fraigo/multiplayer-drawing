@@ -4,6 +4,7 @@ import { BaseItem } from "../base/BaseItem"
 
 import { ExamplePlayer } from "./ExamplePlayer"
 import { Point } from "../base/Point";
+import { Words } from "./Words";
 
 
 
@@ -33,24 +34,6 @@ export class ExampleState extends State {
         "#fff",
     ]
 
-    words={
-        "en" : [
-            "icecream",
-            "tree",
-            "tree",
-        ],
-        "es" : [
-            "helado",
-            "banana",
-            "caramelo",
-            "sandia",
-            "uvas",
-            "uvas",
-            "pastel",
-            "chocolate",
-        ],
-    }
-
     currentId = '';
 
     word : string = null;
@@ -58,8 +41,10 @@ export class ExampleState extends State {
     selLetters : Array<string> = [];
     currentLetters : Array<string> = [];
     realLetters : Array<string> = [];
+    words : any = new Words();
 
     getWord(lang){
+        return "regrigerador";
         let words=this.words[lang];
         let idx=Math.round(Math.random()*(words.length-1));
         console.log('selection',idx,words.length)
@@ -73,8 +58,8 @@ export class ExampleState extends State {
         let letters : Array<string> = allLetters.filter((item, pos) => allLetters.indexOf(item) == pos);
         letters.sort();
         let tries = 0;
-        while(letters.length>12){
-            let idx = Math.round(Math.random()*12);
+        while(letters.length>13){
+            let idx = Math.round(Math.random()*13);
             if (wordLetters.indexOf(letters[idx])==-1){
                 let letter=letters.splice(idx,1);
             }
@@ -83,21 +68,88 @@ export class ExampleState extends State {
         return letters;
     }
 
-    start(){
-        if (this.word==null){
-            this.word = this.getWord('es');
-            console.log("WORD",this.word);    
-        }
+    nextWord(){
+        this.word = this.getWord('es');
+        console.log("WORD",this.word);    
         this.realLetters = this.word.split("");
         this.currentLetters = this.realLetters.concat([]);
-        this.square("square",0,0,160,200,"#eee8",10,"");
         this.selLetters = this.getLetters(this.word);
+    }
+
+    start(){
+        if (this.word==null){
+            this.nextWord();
+        }
         let idx : any = 0;
         for(idx in this.palette){
-            const pos1 = (60*idx)+30;
-            this.square("color"+idx,900,pos1,60,60,this.palette[idx],10,"");
+            const pos1 = (64*idx)+20;
+            this.square("color"+idx,925,pos1,50,50,this.palette[idx],10,"");
+            if (idx==0){
+                this.ui['color'+idx].width=64;
+                this.ui['color'+idx].height=64;
+            }
         }
         console.log(this.selLetters);
+    }
+
+    resetDrawing(){
+        let idx: any;
+        for(idx in this.items){
+            if (this.items[idx].type=='line'){
+                delete this.items[idx];
+            }
+        }
+    }
+
+    resetPlayer(player: ExamplePlayer){
+        let idx: any;
+        const sep = 76;
+        for(idx in player.privateItems){
+            if (player.privateItems[idx].type=='temp'){
+                delete player.privateItems[idx];
+            }
+        }
+        for(idx in this.selLetters){
+            const pos1 = (sep*idx)+40;
+            player.privateItems["sel"+idx]=this.item({
+                x:pos1,
+                y:950,
+                width: 60,
+                radius: 0,
+                height: 80,
+                borderRadius: 8,
+                bgcolor: '#ddd',
+                type: 'temp',
+                label: this.selLetters[idx],
+                fontSize: 40
+            })
+        }
+        for(idx in this.realLetters){
+            const pos1 = (sep*idx)+40+(12-this.realLetters.length)*40;
+            player.privateItems["mysel"+idx]=this.item({
+                x:pos1,
+                y:850,
+                width: 60,
+                radius: 0,
+                height: 80,
+                borderRadius: 8,
+                bgcolor: '#fff',
+                label: "",
+                type: 'temp',
+                fontSize: 40
+            })
+        }
+        player.privateItems["back"]=this.item({
+            x:(sep*this.realLetters.length)+40+(12-this.realLetters.length)*40,
+            y:850,
+            width: 60,
+            height: 80,
+            borderRadius: 8,
+            bgcolor: '#888',
+            label: "<",
+            type: 'temp',
+            fontSize: 40
+        })
     }
     
     initPlayer (player: ExamplePlayer){
@@ -115,49 +167,12 @@ export class ExampleState extends State {
             item.label += " ";
         }
         let idx : any = 0;
-        for(idx in this.selLetters){
-            const pos1 = (80*idx)+60;
-            player.privateItems["sel"+idx]=this.item({
-                x:pos1,
-                y:930,
-                width: 60,
-                radius: 0,
-                height: 80,
-                borderRadius: 8,
-                bgcolor: '#ddd',
-                label: this.selLetters[idx],
-                fontSize: 40
-            })
-        }
-        for(idx in this.realLetters){
-            const pos1 = (80*idx)+30+(11-this.realLetters.length)*40;
-            player.privateItems["mysel"+idx]=this.item({
-                x:pos1,
-                y:830,
-                width: 60,
-                radius: 0,
-                height: 80,
-                borderRadius: 8,
-                bgcolor: '#fff',
-                label: "",
-                fontSize: 40
-            })
-        }
-        player.privateItems["back"]=this.item({
-            x:(80*this.realLetters.length)+30+(11-this.realLetters.length)*40,
-            y:830,
-            width: 60,
-            height: 80,
-            borderRadius: 8,
-            bgcolor: '#888',
-            label: "<",
-            fontSize: 40
-        })
+        this.resetPlayer(player);
         this.ui["player"+player.UUID]=item;
         this.updatePlayerUi();
         //console.log("Current",this.currentId,Object.keys(this.ui));
         if (this.currentId=='' && this.playerCount>1){
-            this.nextPlayer();
+            this.nextPlayer(this.nextId());
         }
     }
 
@@ -213,13 +228,13 @@ export class ExampleState extends State {
             if (cmd.type=="touch"){
                 for(idx in this.palette){
                     let myItem : BaseItem = this.ui["color"+idx];
-                    myItem.label = "";
-                    console.log(idx, myItem.bgcolor, myItem.x, myItem.y);
+                    myItem.width = 50;
+                    myItem.height = 50;
                     if (myItem.collisionWithPoint(cmd.px,cmd.py)){
                         selectedItem = myItem;
-                        console.log("click", myItem.bgcolor );
                         player.brushColor = myItem.bgcolor;
-                        myItem.label = "o";
+                        myItem.width = 64;
+                        myItem.height = 64;
                         player.x0=-1;
                         player.y0=-1;
                     }
@@ -242,7 +257,8 @@ export class ExampleState extends State {
                         stroke: player.brushColor,
                         radius: 5,
                         lineWidth: 10,
-                        bgcolor: player.brushColor
+                        bgcolor: player.brushColor,
+                        type:'line',
                     });
                     var p0=new Point();
                     p0.x=player.x0;
@@ -280,32 +296,35 @@ export class ExampleState extends State {
                 if (selectedItem){
                     console.log("press",selectedItem.label, id);
                     let selword = "";
-                    for(idx in player.privateItems){
-                        if (idx.indexOf("mysel")!=0){
-                            continue;
-                        }
-                        if (player.privateItems[idx].label==""){
-                            player.privateItems[idx].label=selectedItem.label;
-                            selword+=player.privateItems[idx].label;
+                    let index : number;
+                    for(index=0; index<this.word.length; index++){
+                        let selCard=player.privateItems["mysel"+index];
+                        if (selCard.label==""){
+                            selCard.label=selectedItem.label;
+                            selword+=selCard.label;
                             console.log('SELWORD',selword,this.word);
                             if (selword==this.word){
-                                this.square('win',300,400,400,200,"#fff",20,player.name+" Wins");
+                                this.square('win',300,400,400,200,"#fff8",20,player.name+" Wins");
+                                this.square('word',400,410,200,40,"#ff0",14,this.word);
+                                let currentPlayer = this.players[this.currentId];
+                                currentPlayer.score+=50;
                                 this.currentId='';
                                 player.score+=100;
                                 this.updatePlayerUi();
                                 player.privateItems['myturn']=this.item({
                                     x:500,
-                                    y:550,
-                                    width:120,
-                                    height: 40,
+                                    y:560,
+                                    width:260,
+                                    height: 50,
                                     label: "My Turn",
-                                    bgcolor: "#8F8",
+                                    bgcolor: "#4F4",
+                                    fontSize: 40,
                                     borderRadius: 10,
                                 })
                             }
                             break;
                         }else{
-                            selword+=player.privateItems[idx].label;
+                            selword+=selCard.label;
                         }
                     }
                 }
@@ -333,6 +352,7 @@ export class ExampleState extends State {
                 if (myTurn.collisionWithPoint(cmd.px,cmd.py)){
                     delete player.privateItems.myturn;
                     delete this.ui.win;
+                    delete this.ui.word;
                     this.nextTurn(id);
                 }
             }
@@ -340,15 +360,20 @@ export class ExampleState extends State {
     }
 
     nextTurn(id: string){
-        this.currentId=id;
-        
+        this.nextWord();
+        let idx: any;
+        this.resetDrawing();
+        for(idx in this.players){
+            this.resetPlayer(this.players[idx]);
+        }
+        this.nextPlayer(id);
     }
 
-    nextPlayer (){
+    nextId(){
         var ids=Object.keys(this.players);
         console.log("NextPlayer",this.currentId);
         if (this.currentId==''){
-            this.currentId=ids[0];
+            return ids[0];
         }else{
             var pos=ids.indexOf(this.currentId)+1;
             if (pos>=ids.length){
@@ -357,10 +382,15 @@ export class ExampleState extends State {
                 this.currentId=ids[pos];
             }    
         }
+    }
+
+    nextPlayer (id: string){
+        this.currentId=id;
         this.updatePlayerUi();
         var player = this.getPlayer(this.currentId);
         player.notify("It's your turn");
         let idx: any;
+        console.log("keys",Object.keys(player.privateItems));
         for(idx in this.realLetters){
             player.privateItems["mysel"+idx].label=this.realLetters[idx];
             player.privateItems["mysel"+idx].bgcolor='#cfc';
@@ -377,9 +407,10 @@ export class ExampleState extends State {
             height: 20,
             radius: 0,
             borderRadius: 10,
-            bgcolor: this.colors[player.index],
+            bgcolor: "#8f8",
             label: "It's your turn",
-            fontSize: 16
+            fontSize: 16,
+            type: 'temp'
         })
         console.log("notify",player.name);        
         return this.currentId;
@@ -387,7 +418,6 @@ export class ExampleState extends State {
 
     updatePlayerUi(){
         var idx=0;
-        console.log(Object.keys(this.ui));
         for(var p in this.players){
             var pl = this.players[p];
             var plui = this.ui["player"+pl.UUID];
@@ -415,7 +445,7 @@ export class ExampleState extends State {
         super.removePlayer(id);
         this.updatePlayerUi();
         if (this.currentId==id){
-            this.nextPlayer();
+            this.nextPlayer(this.nextId());
         }else{
 
         }

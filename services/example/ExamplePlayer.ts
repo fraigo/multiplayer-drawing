@@ -8,10 +8,13 @@ import { ExampleState } from "./ExampleState"
 export class ExamplePlayer extends BasePlayer {
 
     @type("int16")
-    x0 = 0;
+    x0 = -1;
 
     @type("int16")
-    y0 = 0;
+    y0 = -1;
+
+    @type("int16")
+    score = 0;
 
     @type("string")
     selected = "";

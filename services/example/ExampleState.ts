@@ -33,40 +33,66 @@ export class ExampleState extends State {
         "#fff",
     ]
 
+    words={
+        "en" : [
+            "icecream",
+            "tree",
+            "tree",
+        ],
+        "es" : [
+            "helado",
+            "banana",
+            "caramelo",
+            "sandia",
+            "uvas",
+            "uvas",
+            "pastel",
+            "chocolate",
+        ],
+    }
+
     currentId = '';
 
-    word : string = "testing";
+    word : string = null;
+    winner : string = null;
     selLetters : Array<string> = [];
     currentLetters : Array<string> = [];
     realLetters : Array<string> = [];
 
+    getWord(lang){
+        let words=this.words[lang];
+        let idx=Math.round(Math.random()*(words.length-1));
+        console.log('selection',idx,words.length)
+        return words[idx];
+    }
     
     getLetters(word: string): Array<string>{
-        let altLetters = "aeioudlmnrs".split("");
+        let altLetters = "aeioucdglmnprst".split("");
         let wordLetters : Array<string> = word.split("").filter((item, pos) => word.indexOf(item) == pos);
         let allLetters: Array<string> = wordLetters.concat(altLetters);
         let letters : Array<string> = allLetters.filter((item, pos) => allLetters.indexOf(item) == pos);
         letters.sort();
+        let tries = 0;
         while(letters.length>12){
             let idx = Math.round(Math.random()*12);
-            if (wordLetters.indexOf(letters[idx])!=-1){
-                altLetters.splice(idx,1);
+            if (wordLetters.indexOf(letters[idx])==-1){
+                let letter=letters.splice(idx,1);
             }
+            tries++;
         }
         return letters;
     }
 
     start(){
-        this.word = "icecream";
+        if (this.word==null){
+            this.word = this.getWord('es');
+            console.log("WORD",this.word);    
+        }
         this.realLetters = this.word.split("");
         this.currentLetters = this.realLetters.concat([]);
         this.square("square",0,0,160,200,"#eee8",10,"");
         this.selLetters = this.getLetters(this.word);
         let idx : any = 0;
-        for(idx in this.selLetters){
-            const pos1 = (80*idx)+30;
-            this.square("sel"+idx,pos1,900,60,80,"#fff",10,this.selLetters[idx]);
-        }
         for(idx in this.palette){
             const pos1 = (60*idx)+30;
             this.square("color"+idx,900,pos1,60,60,this.palette[idx],10,"");
@@ -83,16 +109,33 @@ export class ExampleState extends State {
         item.label=player.name;
         item.labelx=20;
         item.labelAlign='left';
+        player.brushColor='#000';
+        player.score = 0;
         if (this.playerCount==1){
             item.label += " ";
         }
         let idx : any = 0;
+        for(idx in this.selLetters){
+            const pos1 = (80*idx)+60;
+            player.privateItems["sel"+idx]=this.item({
+                x:pos1,
+                y:930,
+                width: 60,
+                radius: 0,
+                height: 80,
+                borderRadius: 8,
+                bgcolor: '#ddd',
+                label: this.selLetters[idx],
+                fontSize: 40
+            })
+        }
         for(idx in this.realLetters){
-            const pos1 = (80*idx)+30+(12-this.realLetters.length)*40;
-            player.items["sel"+idx]=this.item({
+            const pos1 = (80*idx)+30+(11-this.realLetters.length)*40;
+            player.privateItems["mysel"+idx]=this.item({
                 x:pos1,
                 y:830,
                 width: 60,
+                radius: 0,
                 height: 80,
                 borderRadius: 8,
                 bgcolor: '#fff',
@@ -100,6 +143,16 @@ export class ExampleState extends State {
                 fontSize: 40
             })
         }
+        player.privateItems["back"]=this.item({
+            x:(80*this.realLetters.length)+30+(11-this.realLetters.length)*40,
+            y:830,
+            width: 60,
+            height: 80,
+            borderRadius: 8,
+            bgcolor: '#888',
+            label: "<",
+            fontSize: 40
+        })
         this.ui["player"+player.UUID]=item;
         this.updatePlayerUi();
         //console.log("Current",this.currentId,Object.keys(this.ui));
@@ -153,36 +206,27 @@ export class ExampleState extends State {
         if (cmd.type=="move"){
             return;
         }
+        let idx : any;
+        let selectedItem : BaseItem = null;
         if (id==this.currentId){
             player.selected=this.word;
             if (cmd.type=="touch"){
-                let idx : any;
-                let item : BaseItem = null;
                 for(idx in this.palette){
                     let myItem : BaseItem = this.ui["color"+idx];
                     myItem.label = "";
                     console.log(idx, myItem.bgcolor, myItem.x, myItem.y);
                     if (myItem.collisionWithPoint(cmd.px,cmd.py)){
-                        item = myItem;
+                        selectedItem = myItem;
                         console.log("click", myItem.bgcolor );
-                        player.brushColor=myItem.bgcolor;
+                        player.brushColor = myItem.bgcolor;
                         myItem.label = "o";
                         player.x0=-1;
                         player.y0=-1;
                     }
                 }
-                if (item!=null){
+                if (selectedItem!=null){
                     return;
                 }
-                for(idx in this.selLetters){
-                    let myItem : BaseItem = player.items["sel"+idx];
-                    console.log('check letter',myItem.label);
-                    if (myItem && myItem.collisionWithPoint(cmd.px,cmd.py)){
-                        item = myItem;
-                        console.log("press",item.label);
-                    }
-                }
-        
                 console.log("touch",cmd.px,cmd.py);
                 this.drawItem(cmd.px,cmd.py,player);
                 player.x0=cmd.px;
@@ -208,26 +252,101 @@ export class ExampleState extends State {
                     p1.y=cmd.py;
                     player.x0=cmd.px;
                     player.y0=cmd.py;
-
+    
                     item.points["p0"]=p0;
                     item.points["p1"]=p1;
-
-                    this.items[item.id]=item;    
+    
+                    this.items[item.id]=item;
                 }
+
             }
             if (cmd.type=="release"){
                 if (player.x0>=0){
                     console.log("release",cmd.px,cmd.py);
                     this.drawItem(cmd.px,cmd.py,player);   
-                    this.nextPlayer();    
+                }
+            }
+        }else if(this.currentId!=''){
+            if (cmd.type=="release"){
+                for(idx in this.selLetters){
+                    let myItem : BaseItem = player.privateItems["sel"+idx];
+                    if (myItem){
+                        if (myItem.collisionWithPoint(cmd.px,cmd.py)){
+                            selectedItem = myItem;
+                            break;
+                        }
+                    }
+                }
+                if (selectedItem){
+                    console.log("press",selectedItem.label, id);
+                    let selword = "";
+                    for(idx in player.privateItems){
+                        if (idx.indexOf("mysel")!=0){
+                            continue;
+                        }
+                        if (player.privateItems[idx].label==""){
+                            player.privateItems[idx].label=selectedItem.label;
+                            selword+=player.privateItems[idx].label;
+                            console.log('SELWORD',selword,this.word);
+                            if (selword==this.word){
+                                this.square('win',300,400,400,200,"#fff",20,player.name+" Wins");
+                                this.currentId='';
+                                player.score+=100;
+                                this.updatePlayerUi();
+                                player.privateItems['myturn']=this.item({
+                                    x:500,
+                                    y:550,
+                                    width:120,
+                                    height: 40,
+                                    label: "My Turn",
+                                    bgcolor: "#8F8",
+                                    borderRadius: 10,
+                                })
+                            }
+                            break;
+                        }else{
+                            selword+=player.privateItems[idx].label;
+                        }
+                    }
+                }
+                let myItem : BaseItem = player.privateItems["back"];
+                if (myItem){
+                    myItem.debug = true;
+                    if (myItem.collisionWithPoint(cmd.px,cmd.py)){
+                        console.log("press back");
+                        selectedItem = myItem;
+                        let nextKey = "mysel0";
+                        for(idx in player.privateItems){
+                            if (player.privateItems[idx].label=="" || idx=='back'){
+                                break;
+                            }
+                            nextKey = idx;
+                        }
+                        player.privateItems[nextKey].label='';
+                    }
+                }
+                
+            }
+        }else{
+            let myTurn : BaseItem = player.privateItems["myturn"];
+            if (myTurn){
+                if (myTurn.collisionWithPoint(cmd.px,cmd.py)){
+                    delete player.privateItems.myturn;
+                    delete this.ui.win;
+                    this.nextTurn(id);
                 }
             }
         }
     }
 
+    nextTurn(id: string){
+        this.currentId=id;
+        
+    }
+
     nextPlayer (){
         var ids=Object.keys(this.players);
-        console.log("Next",ids,this.currentId);
+        console.log("NextPlayer",this.currentId);
         if (this.currentId==''){
             this.currentId=ids[0];
         }else{
@@ -241,6 +360,27 @@ export class ExampleState extends State {
         this.updatePlayerUi();
         var player = this.getPlayer(this.currentId);
         player.notify("It's your turn");
+        let idx: any;
+        for(idx in this.realLetters){
+            player.privateItems["mysel"+idx].label=this.realLetters[idx];
+            player.privateItems["mysel"+idx].bgcolor='#cfc';
+            player.privateItems["back"].bgcolor='#000';
+            let idx1: any;
+            for(idx1 in this.selLetters){
+                player.privateItems["sel"+idx1].visible=false;
+            }
+        }
+        player.privateItems["yourturn"]=this.item({
+            x:500,
+            y:50,
+            width: 400,
+            height: 20,
+            radius: 0,
+            borderRadius: 10,
+            bgcolor: this.colors[player.index],
+            label: "It's your turn",
+            fontSize: 16
+        })
         console.log("notify",player.name);        
         return this.currentId;
     }
@@ -254,12 +394,13 @@ export class ExampleState extends State {
             plui.label=pl.name;
             plui.y=30+45*idx;
             plui.labely=8;
+            this.ui["player"+pl.UUID].label=pl.name+" "+pl.score;
             idx++;
         }
         if (this.currentId!=''){
             var player = this.getPlayer(this.currentId);
             if (player){
-                this.ui["player"+player.UUID].label=this.players[this.currentId].name+" <<";
+                this.ui["player"+player.UUID].label+=" ◉";
             }
         }
     }

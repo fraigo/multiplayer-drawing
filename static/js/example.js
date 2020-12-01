@@ -174,7 +174,7 @@ function drawObject(ctx,object,dx,dy){
     ctx.font = object.fontSize + "px Arial";
     ctx.textAlign = object.labelAlign?object.labelAlign:'center';
     var lx=object.labelx?object.labelx:0;
-    var ly=object.labely?object.labely:(h/5);
+    var ly=object.labely?object.labely:(object.fontSize/3);
     ctx.fillText(object.label, dx+object.x+lx, dy+object.y+ly);  
   }
 }
@@ -216,14 +216,19 @@ function joinRoom(room){
       var object = items[$i];
       drawObject(ctx,object);
     }
-    for(var $index in players){
-      var object = players[$index];
-      drawObject(ctx,object);
-    }
     for(var $index in ui){
       //console.log("UI",$index);
       var object = ui[$index];
       drawObject(ctx,object);
+    }
+    for(var $index in players){
+      var object = players[$index];
+      drawObject(ctx,object);
+      if ($index==room.sessionId){
+        for(var $item in object.privateItems){
+          drawObject(ctx,object.privateItems[$item]);
+        }
+      }
     }
     ctx.fillStyle = "#fff";
     ctx.font = "20px Arial";

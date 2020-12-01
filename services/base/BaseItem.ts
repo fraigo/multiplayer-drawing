@@ -20,7 +20,7 @@ export class BaseItem extends Schema {
     y = 0;
 
     @type("number")
-    radius = 1;
+    radius = 0;
 
     @type("number")
     borderRadius = 0;
@@ -67,6 +67,9 @@ export class BaseItem extends Schema {
     @type("boolean")
     visible = true;
 
+    @type("boolean")
+    debug = false;    
+
     @type("string")
     sprite = "";
 
@@ -110,6 +113,7 @@ export class BaseItem extends Schema {
         }
         if (radius){
             var dist2=(this.x-px)*(this.x-px)+(this.y-py)*(this.y-py);
+            if (this.debug) console.log('dist2',dist2,'radius2',radius*radius,Math.max(this.width,this.height),this.radius);
             return dist2<radius*radius;
         }
         return false;

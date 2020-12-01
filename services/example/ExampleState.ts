@@ -44,7 +44,6 @@ export class ExampleState extends State {
     words : any = new Words();
 
     getWord(lang){
-        return "regrigerador";
         let words=this.words[lang];
         let idx=Math.round(Math.random()*(words.length-1));
         console.log('selection',idx,words.length)
@@ -53,11 +52,13 @@ export class ExampleState extends State {
     
     getLetters(word: string): Array<string>{
         let altLetters = "aeioucdglmnprst".split("");
-        let wordLetters : Array<string> = word.split("").filter((item, pos) => word.indexOf(item) == pos);
-        let allLetters: Array<string> = wordLetters.concat(altLetters);
+        let wordLetters : Array<string> = word.split("");
+        let wordUniqueLetters : Array<string> = wordLetters.filter((item, pos) => wordLetters.indexOf(item) == pos);
+        let allLetters: Array<string> = wordUniqueLetters.concat(altLetters);
         let letters : Array<string> = allLetters.filter((item, pos) => allLetters.indexOf(item) == pos);
         letters.sort();
         let tries = 0;
+        console.log("letters",word.split(""),wordLetters,letters);
         while(letters.length>13){
             let idx = Math.round(Math.random()*13);
             if (wordLetters.indexOf(letters[idx])==-1){

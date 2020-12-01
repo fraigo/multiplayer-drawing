@@ -96,7 +96,8 @@ export class ExampleState extends State {
     resetDrawing(){
         let idx: any;
         for(idx in this.items){
-            if (this.items[idx].type=='line'){
+            if (this.items[idx].type=='drawing'){
+                this.items[idx].visible=false;
                 delete this.items[idx];
             }
         }
@@ -205,7 +206,8 @@ export class ExampleState extends State {
                 x:px,
                 y:py,
                 radius: 5,
-                bgcolor: player.brushColor
+                bgcolor: player.brushColor,
+                type: 'drawing'
             });
         this.items[item.id]=item;
     }
@@ -259,7 +261,7 @@ export class ExampleState extends State {
                         radius: 5,
                         lineWidth: 10,
                         bgcolor: player.brushColor,
-                        type:'line',
+                        type:'drawing',
                     });
                     var p0=new Point();
                     p0.x=player.x0;
@@ -361,9 +363,9 @@ export class ExampleState extends State {
     }
 
     nextTurn(id: string){
+        this.resetDrawing();
         this.nextWord();
         let idx: any;
-        this.resetDrawing();
         for(idx in this.players){
             this.resetPlayer(this.players[idx]);
         }

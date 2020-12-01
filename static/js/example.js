@@ -275,6 +275,12 @@ function joinRoom(room){
       triggerDraw();
     }
 
+    room.state.items.onRemove = function(item, sessionId) {
+      var pos=items.indexOf(item);
+      items.splice(pos,1);
+      triggerDraw();
+    }
+
     room.state.ui.onAdd = function(item, sessionId) {
       
       ui.push(item);

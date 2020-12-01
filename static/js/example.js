@@ -9,6 +9,13 @@ var PI2=2*Math.PI;
 
 var playerName = document.getElementById("playername");
 playerName.focus();
+playerName.value=localStorage.lastUser?localStorage.lastUser:'';
+playerName.addEventListener("keyup",function(ev){
+  localStorage.lastUser=playerName.value;
+})
+setTimeout(function(){
+  playerName.select();
+},500)
 
 client.onOpen.add(function() {
   document.querySelector("#game-ui").style.display='';

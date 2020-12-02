@@ -105,33 +105,38 @@ export class ExampleState extends State {
 
     resetPlayer(player: ExamplePlayer){
         let idx: any;
-        const sep = 76;
         for(idx in player.privateItems){
             if (player.privateItems[idx].type=='temp'){
                 delete player.privateItems[idx];
             }
         }
+    }
+
+    setupPlayer(player: ExamplePlayer){
+        let idx: any;
+        const sep = 100;
+        const sep2 = 62;
         for(idx in this.selLetters){
-            const pos1 = (sep*idx)+40;
+            const pos1 = (sep*(idx%6))+240;
             player.privateItems["sel"+idx]=this.item({
                 x:pos1,
-                y:950,
-                width: 60,
+                y:idx>=6 ? 950:820,
+                width: 80,
                 radius: 0,
-                height: 80,
+                height: 100,
                 borderRadius: 8,
                 bgcolor: '#ddd',
                 type: 'temp',
                 label: this.selLetters[idx],
-                fontSize: 40
+                fontSize: 40,
             })
         }
         for(idx in this.realLetters){
-            const pos1 = (sep*idx)+40+(12-this.realLetters.length)*40;
+            const pos1 = (sep2*idx)+50+(12-this.realLetters.length)*40;
             player.privateItems["mysel"+idx]=this.item({
                 x:pos1,
-                y:850,
-                width: 60,
+                y:700,
+                width: sep2-2,
                 radius: 0,
                 height: 80,
                 borderRadius: 8,
@@ -142,9 +147,9 @@ export class ExampleState extends State {
             })
         }
         player.privateItems["back"]=this.item({
-            x:(sep*this.realLetters.length)+40+(12-this.realLetters.length)*40,
-            y:850,
-            width: 60,
+            x:(sep2*this.realLetters.length)+50+(12-this.realLetters.length)*40,
+            y:700,
+            width: sep2-2,
             height: 80,
             borderRadius: 8,
             bgcolor: '#888',
@@ -152,7 +157,7 @@ export class ExampleState extends State {
             type: 'temp',
             fontSize: 40
         })
-    }
+    }    
     
     initPlayer (player: ExamplePlayer){
         console.log("Init player");
@@ -174,7 +179,7 @@ export class ExampleState extends State {
         this.updatePlayerUi();
         //console.log("Current",this.currentId,Object.keys(this.ui));
         if (this.currentId=='' && this.playerCount>1){
-            this.nextPlayer(this.nextId());
+            this.nextTurn(this.nextId());
         }
     }
 
@@ -307,7 +312,7 @@ export class ExampleState extends State {
                             selword+=selCard.label;
                             console.log('SELWORD',selword,this.word);
                             if (selword==this.word){
-                                this.square('win',300,400,400,200,"#fff8",20,player.name+" Wins");
+                                this.square('win',300,380,400,220,"#fffA",20,player.name+" Wins");
                                 this.square('word',400,410,200,40,"#ff0",14,this.word);
                                 let currentPlayer = this.players[this.currentId];
                                 currentPlayer.score+=50;
@@ -321,6 +326,7 @@ export class ExampleState extends State {
                                     height: 50,
                                     label: "My Turn",
                                     bgcolor: "#4F4",
+                                    stroke: "#080",
                                     fontSize: 40,
                                     borderRadius: 10,
                                 })
@@ -368,6 +374,7 @@ export class ExampleState extends State {
         let idx: any;
         for(idx in this.players){
             this.resetPlayer(this.players[idx]);
+            this.setupPlayer(this.players[idx]);
         }
         this.nextPlayer(id);
     }

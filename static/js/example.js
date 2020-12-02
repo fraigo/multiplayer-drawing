@@ -19,6 +19,7 @@ setTimeout(function(){
 
 client.onOpen.add(function() {
   document.querySelector("#game-ui").style.display='';
+  document.querySelector("#game").style.visibility='hidden';
   showRooms();
 });
 
@@ -76,14 +77,17 @@ function createGame(){
   currentRoom= client.join("example",{create:true,name:userName})
   joinRoom(currentRoom)
   document.title=userName;
-  document.querySelector("#game-ui").style.display='none'
+  document.querySelector("#game-ui").style.display='none';
+  document.querySelector("#game").style.visibility='';
+
 }
 
 function selectGame(id){
   currentRoom= client.join("example",{id:id,name:userName})
   joinRoom(currentRoom)
   document.title=userName;
-  document.querySelector("#game-ui").style.display='none'
+  document.querySelector("#game-ui").style.display='none';
+  document.querySelector("#game").style.visibility='';
 }
 
 function sendIdleKey(room){

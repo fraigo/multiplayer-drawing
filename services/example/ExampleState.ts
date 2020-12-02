@@ -414,12 +414,12 @@ export class ExampleState extends State {
             x:500,
             y:50,
             width: 400,
-            height: 20,
+            height: 30,
             radius: 0,
             borderRadius: 10,
             bgcolor: "#8f8",
             label: "It's your turn",
-            fontSize: 16,
+            fontSize: 24,
             type: 'temp'
         })
         console.log("notify",player.name);        

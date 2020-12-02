@@ -321,6 +321,7 @@ export class ExampleState extends State {
                             console.log('SELWORD',selword,this.word);
                             if (selword==this.word){
                                 this.square('win',300,380,400,220,"#fffA",20,player.name+" "+this.language[this.lang].wins);
+                                this.ui['win'].stroke='#ccc';
                                 this.square('word',400,410,200,40,"#ff0",14,this.word);
                                 let currentPlayer = this.players[this.currentId];
                                 currentPlayer.score+=50;

@@ -12,6 +12,8 @@ export class State extends GameState {
     items = new MapSchema<BaseItem>();
     @type({ map: BaseItem })
     ui = new MapSchema<BaseItem>();
+    @type("string")
+    lang = "en";
 
     STATE_START = 0;
     STATE_PLAYING = 1;
@@ -27,7 +29,7 @@ export class State extends GameState {
     last_time = this.time;
     diff = 0;
     
-    createPlayer (id: string, name: string, client: any) {
+    createPlayer (id: string, name: string, lang: string, client: any) {
         if (this.state == this.STATE_FINISH){
             return;
         }
@@ -48,6 +50,7 @@ export class State extends GameState {
         newItem.index =  index;
         newItem.UUID =  id;
         newItem.name = name;
+        newItem.lang = lang;
         this.players[id] = newItem;
         this.playerSlots[index] = true;
         this.playerCount++;

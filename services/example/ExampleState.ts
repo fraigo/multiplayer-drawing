@@ -5,6 +5,7 @@ import { BaseItem } from "../base/BaseItem"
 import { ExamplePlayer } from "./ExamplePlayer"
 import { Point } from "../base/Point";
 import { Words } from "./Words";
+import { Lang } from "./Lang";
 
 
 
@@ -42,6 +43,8 @@ export class ExampleState extends State {
     currentLetters : Array<string> = [];
     realLetters : Array<string> = [];
     words : any = new Words();
+    language : any = new Lang();
+    lang : string = "en";
 
     getWord(lang){
         let words=this.words[lang];
@@ -58,19 +61,19 @@ export class ExampleState extends State {
         let letters : Array<string> = allLetters.filter((item, pos) => allLetters.indexOf(item) == pos);
         letters.sort();
         let tries = 0;
-        console.log("letters",word.split(""),wordLetters,letters);
-        while(letters.length>13){
-            let idx = Math.round(Math.random()*13);
+        while(letters.length>14){
+            let idx = Math.round(Math.random()*14);
             if (wordLetters.indexOf(letters[idx])==-1){
                 let letter=letters.splice(idx,1);
             }
             tries++;
         }
+        console.log(wordLetters,letters);
         return letters;
     }
 
     nextWord(){
-        this.word = this.getWord('es');
+        this.word = this.getWord(this.lang);
         console.log("WORD",this.word);    
         this.realLetters = this.word.split("");
         this.currentLetters = this.realLetters.concat([]);
@@ -78,9 +81,6 @@ export class ExampleState extends State {
     }
 
     start(){
-        if (this.word==null){
-            this.nextWord();
-        }
         let idx : any = 0;
         for(idx in this.palette){
             const pos1 = (64*idx)+20;
@@ -90,7 +90,6 @@ export class ExampleState extends State {
                 this.ui['color'+idx].height=64;
             }
         }
-        console.log(this.selLetters);
     }
 
     resetDrawing(){
@@ -114,13 +113,13 @@ export class ExampleState extends State {
 
     setupPlayer(player: ExamplePlayer){
         let idx: any;
-        const sep = 100;
+        const sep = 110;
         const sep2 = 62;
         for(idx in this.selLetters){
-            const pos1 = (sep*(idx%6))+240;
+            const pos1 = (sep*(idx%7))+140;
             player.privateItems["sel"+idx]=this.item({
                 x:pos1,
-                y:idx>=6 ? 950:820,
+                y:idx>=7 ? 950:820,
                 width: 80,
                 radius: 0,
                 height: 100,
@@ -132,7 +131,7 @@ export class ExampleState extends State {
             })
         }
         for(idx in this.realLetters){
-            const pos1 = (sep2*idx)+50+(12-this.realLetters.length)*40;
+            const pos1 = (sep2*idx)+50+(13-this.realLetters.length)*40;
             player.privateItems["mysel"+idx]=this.item({
                 x:pos1,
                 y:700,
@@ -147,7 +146,7 @@ export class ExampleState extends State {
             })
         }
         player.privateItems["back"]=this.item({
-            x:(sep2*this.realLetters.length)+50+(12-this.realLetters.length)*40,
+            x:(sep2*this.realLetters.length)+50+(13-this.realLetters.length)*40,
             y:700,
             width: sep2-2,
             height: 80,
@@ -160,6 +159,10 @@ export class ExampleState extends State {
     }    
     
     initPlayer (player: ExamplePlayer){
+        if (this.word==null){
+            this.lang = player.lang;
+            this.nextWord();
+        }
         console.log("Init player");
         var item=new BaseItem();
         item.radius=10;
@@ -307,12 +310,13 @@ export class ExampleState extends State {
                     let index : number;
                     for(index=0; index<this.word.length; index++){
                         let selCard=player.privateItems["mysel"+index];
+                        console.log("mysel"+index);
                         if (selCard.label==""){
                             selCard.label=selectedItem.label;
                             selword+=selCard.label;
                             console.log('SELWORD',selword,this.word);
                             if (selword==this.word){
-                                this.square('win',300,380,400,220,"#fffA",20,player.name+" Wins");
+                                this.square('win',300,380,400,220,"#fffA",20,player.name+" "+this.language[this.lang].wins);
                                 this.square('word',400,410,200,40,"#ff0",14,this.word);
                                 let currentPlayer = this.players[this.currentId];
                                 currentPlayer.score+=50;
@@ -324,7 +328,7 @@ export class ExampleState extends State {
                                     y:560,
                                     width:260,
                                     height: 50,
-                                    label: "My Turn",
+                                    label: this.language[this.lang].my_turn,
                                     bgcolor: "#4F4",
                                     stroke: "#080",
                                     fontSize: 40,
@@ -400,7 +404,6 @@ export class ExampleState extends State {
         var player = this.getPlayer(this.currentId);
         player.notify("It's your turn");
         let idx: any;
-        console.log("keys",Object.keys(player.privateItems));
         for(idx in this.realLetters){
             player.privateItems["mysel"+idx].label=this.realLetters[idx];
             player.privateItems["mysel"+idx].bgcolor='#cfc';
@@ -418,7 +421,7 @@ export class ExampleState extends State {
             radius: 0,
             borderRadius: 10,
             bgcolor: "#8f8",
-            label: "It's your turn",
+            label: this.language[this.lang].your_turn,
             fontSize: 24,
             type: 'temp'
         })

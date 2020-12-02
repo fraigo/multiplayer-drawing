@@ -15,6 +15,9 @@ export class BasePlayer extends BaseItem {
     name = "Player"
 
     @type("string")
+    lang = "en"
+
+    @type("string")
     UUID = ""
 
     @type("string")

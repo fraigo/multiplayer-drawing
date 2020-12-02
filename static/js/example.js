@@ -1,4 +1,33 @@
 
+var lang="en";
+
+if (navigator.language.indexOf("es-")){
+  lang="es";
+}
+
+if (document.location.hash=="#es"){
+  lang="es"
+}
+if (document.location.hash=="#en"){
+  lang="en"
+}
+
+var language={
+  en:{
+    "enter_your_name":"Name",
+    "select_game":"Select a Game",
+    "create_game":"Create New Game",
+  },
+  es:{
+    "enter_your_name":"Nombre",
+    "select_game":"Selecciona Juego",
+    "create_game":"Crear Nuevo Juego",
+  }
+}
+
+document.getElementById("enter_your_name").innerText=language[lang].enter_your_name;
+document.getElementById("select_game").innerText=language[lang].select_game;
+
 var canvas = document.getElementById("game");
 var host = window.document.location.host.replace(/:.*/, '');
 var client = new Colyseus.Client(location.protocol.replace("http", "ws") + host + (location.port ? ':' + location.port : ''));
@@ -65,7 +94,7 @@ function showRooms(){
     .map(function(room){
       return "<button onclick=selectGame('"+room.roomId+"') >"+room.roomId+" ("+room.clients+"/"+room.maxClients+")</button>"
     })
-    items.push("<button onclick=createGame() >Create Game</div>")
+    items.push("<button onclick=createGame() >"+language[lang].create_game+"</div>")
     document.querySelector("#game-ui .ui-selection").innerHTML=(items.join("\n"))
   });
   setTimeout(showRooms,3000);
@@ -74,7 +103,7 @@ function showRooms(){
 var currentRoom;
 
 function createGame(){
-  currentRoom= client.join("example",{create:true,name:userName})
+  currentRoom= client.join("example",{create:true,name:userName,lang:lang})
   joinRoom(currentRoom)
   document.title=userName;
   document.querySelector("#game-ui").style.display='none';
@@ -83,7 +112,7 @@ function createGame(){
 }
 
 function selectGame(id){
-  currentRoom= client.join("example",{id:id,name:userName})
+  currentRoom= client.join("example",{id:id,name:userName,lang:lang})
   joinRoom(currentRoom)
   document.title=userName;
   document.querySelector("#game-ui").style.display='none';

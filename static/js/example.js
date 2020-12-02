@@ -178,6 +178,7 @@ function drawObject(ctx,object,dx,dy){
   }
   var w=object.width?object.width:object.radius*2;
   var h=object.height?object.height:object.radius*2;
+  ctx.lineWidth=object.lineWidth;
   if (object.radius && object.bgcolor){
     ctx.fillStyle = object.bgcolor;
     ctx.arc(dx+object.x, dy+object.y, object.radius,0, PI2);
@@ -185,7 +186,6 @@ function drawObject(ctx,object,dx,dy){
   }
   if (object.points.p0 && object.stroke){
     ctx.strokeStyle=object.stroke;
-    ctx.lineWidth=object.lineWidth;
     ctx.fillStyle = object.bgcolor;
     ctx.beginPath();
     ctx.moveTo(dx+object.points.p0.x, dy+object.points.p0.y);

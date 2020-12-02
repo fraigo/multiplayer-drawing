@@ -27,11 +27,12 @@ export class ExampleState extends State {
         "#00A",
         "#620",
         "#e72",
-        "#fd3",
+        "#a69",
         "#fd3",
         "#8ce",
         "#7ca",
         "#fcc",
+        "#eb9",
         "#aaa",
         "#fff",
     ]
@@ -120,6 +121,7 @@ export class ExampleState extends State {
                 type: 'temp',
                 label: this.selLetters[idx],
                 fontSize: 40,
+                stroke: '#444'
             })
         }
         player.privateItems["back"]=this.item({
@@ -145,7 +147,8 @@ export class ExampleState extends State {
                 bgcolor: '#fff',
                 label: "_",
                 type: 'temp',
-                fontSize: 40
+                fontSize: 40,
+                stroke: '#eee'
             })
         }
 
@@ -241,10 +244,10 @@ export class ExampleState extends State {
                         for(let idx1 in this.palette){
                             let col : BaseItem = player.privateItems["color"+idx1];
                             col.label='';
-                            col.stroke=col.bgcolor;
+                            col.stroke='#fff';
                         }
                         myItem.label='◉';
-                        myItem.stroke='#000';
+                        myItem.stroke='#ff0';
                     }
                 }
                 if (selectedItem!=null){
@@ -436,6 +439,8 @@ export class ExampleState extends State {
                 height: 100,
                 borderRadius: 8,
                 bgcolor: this.palette[idx],
+                stroke: '#fff',
+                lineWidth: 4,
                 type: 'temp',
                 label: ' ',
                 fontSize: 40,

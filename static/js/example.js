@@ -132,9 +132,6 @@ function drawSprite(ctx,sp,sx,sy,bounds,ox,oy){
 }
 
 function roundRect(ctx, x, y, width, height, radius, fill, stroke) {
-  if (typeof stroke === 'undefined') {
-    stroke = true;
-  }
   if (typeof radius === 'undefined') {
     radius = 5;
   }
@@ -158,9 +155,11 @@ function roundRect(ctx, x, y, width, height, radius, fill, stroke) {
   ctx.quadraticCurveTo(x, y, x + radius.tl, y);
   ctx.closePath();
   if (fill) {
+    ctx.fillStyle=fill;
     ctx.fill();
   }
   if (stroke) {
+    ctx.strokeStyle=stroke;
     ctx.stroke();
   }
 
@@ -194,7 +193,6 @@ function drawObject(ctx,object,dx,dy){
     ctx.stroke();
   }
   if (object.width*object.height && object.bgcolor){
-    ctx.fillStyle = object.bgcolor;
     roundRect(ctx,dx+object.x-object.width/2,dy+object.y-object.height/2,object.width,object.height,object.borderRadius?object.borderRadius:0,object.bgcolor,object.stroke); 
   }
   if (object.sprite && sprites[object.sprite]){

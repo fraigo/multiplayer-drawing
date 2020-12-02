@@ -28,6 +28,7 @@ export class ExampleState extends State {
         "#620",
         "#e72",
         "#fd3",
+        "#fd3",
         "#8ce",
         "#7ca",
         "#fcc",
@@ -81,15 +82,6 @@ export class ExampleState extends State {
     }
 
     start(){
-        let idx : any = 0;
-        for(idx in this.palette){
-            const pos1 = (64*idx)+20;
-            this.square("color"+idx,925,pos1,50,50,this.palette[idx],10,"");
-            if (idx==0){
-                this.ui['color'+idx].width=64;
-                this.ui['color'+idx].height=64;
-            }
-        }
     }
 
     resetDrawing(){
@@ -119,7 +111,7 @@ export class ExampleState extends State {
             const pos1 = (sep*(idx%7))+140;
             player.privateItems["sel"+idx]=this.item({
                 x:pos1,
-                y:idx>=7 ? 950:820,
+                y:idx>=7 ? 940:820,
                 width: 80,
                 radius: 0,
                 height: 100,
@@ -128,21 +120,6 @@ export class ExampleState extends State {
                 type: 'temp',
                 label: this.selLetters[idx],
                 fontSize: 40,
-            })
-        }
-        for(idx in this.realLetters){
-            const pos1 = (sep2*idx)+50+(13-this.realLetters.length)*40;
-            player.privateItems["mysel"+idx]=this.item({
-                x:pos1,
-                y:700,
-                width: sep2-2,
-                radius: 0,
-                height: 80,
-                borderRadius: 8,
-                bgcolor: '#fff',
-                label: "",
-                type: 'temp',
-                fontSize: 40
             })
         }
         player.privateItems["back"]=this.item({
@@ -155,7 +132,23 @@ export class ExampleState extends State {
             label: "<",
             type: 'temp',
             fontSize: 40
-        })
+        })        
+        for(idx in this.realLetters){
+            const pos1 = (sep2*idx)+50+(13-this.realLetters.length)*40;
+            player.privateItems["mysel"+idx]=this.item({
+                x:pos1,
+                y:700,
+                width: sep2-2,
+                radius: 0,
+                height: 80,
+                borderRadius: 8,
+                bgcolor: '#fff',
+                label: "_",
+                type: 'temp',
+                fontSize: 40
+            })
+        }
+
     }    
     
     initPlayer (player: ExamplePlayer){
@@ -183,6 +176,9 @@ export class ExampleState extends State {
         //console.log("Current",this.currentId,Object.keys(this.ui));
         if (this.currentId=='' && this.playerCount>1){
             this.nextTurn(this.nextId());
+        }
+        if (this.currentId!=''){
+            this.setupPlayer(player);
         }
     }
 
@@ -238,22 +234,23 @@ export class ExampleState extends State {
             player.selected=this.word;
             if (cmd.type=="touch"){
                 for(idx in this.palette){
-                    let myItem : BaseItem = this.ui["color"+idx];
-                    myItem.width = 50;
-                    myItem.height = 50;
+                    let myItem : BaseItem = player.privateItems["color"+idx];
                     if (myItem.collisionWithPoint(cmd.px,cmd.py)){
                         selectedItem = myItem;
                         player.brushColor = myItem.bgcolor;
-                        myItem.width = 64;
-                        myItem.height = 64;
-                        player.x0=-1;
-                        player.y0=-1;
+                        for(let idx1 in this.palette){
+                            let col : BaseItem = player.privateItems["color"+idx1];
+                            col.label='';
+                            col.stroke=col.bgcolor;
+                        }
+                        myItem.label='◉';
+                        myItem.stroke='#000';
                     }
                 }
                 if (selectedItem!=null){
                     return;
                 }
-                console.log("touch",cmd.px,cmd.py);
+                //console.log("touch",cmd.px,cmd.py);
                 this.drawItem(cmd.px,cmd.py,player);
                 player.x0=cmd.px;
                 player.y0=cmd.py;
@@ -289,12 +286,13 @@ export class ExampleState extends State {
             }
             if (cmd.type=="release"){
                 if (player.x0>=0){
-                    console.log("release",cmd.px,cmd.py);
+                    //console.log("release",cmd.px,cmd.py);
                     this.drawItem(cmd.px,cmd.py,player);   
                 }
             }
         }else if(this.currentId!=''){
             if (cmd.type=="release"){
+                selectedItem = null;
                 for(idx in this.selLetters){
                     let myItem : BaseItem = player.privateItems["sel"+idx];
                     if (myItem){
@@ -304,15 +302,18 @@ export class ExampleState extends State {
                         }
                     }
                 }
+                let index : number;
                 if (selectedItem){
                     console.log("press",selectedItem.label, id);
                     let selword = "";
-                    let index : number;
                     for(index=0; index<this.word.length; index++){
-                        let selCard=player.privateItems["mysel"+index];
-                        console.log("mysel"+index);
-                        if (selCard.label==""){
+                        const selCard=player.privateItems["mysel"+index];
+                        selCard.bgcolor="#ffe";
+                        console.log("mysel"+index,selCard.label,selCard.x);
+                        if (selCard.label=="_"){
                             selCard.label=selectedItem.label;
+                            selCard.bgcolor="#ffc";
+                            console.log('upd',selCard.label,selCard.bgcolor);
                             selword+=selCard.label;
                             console.log('SELWORD',selword,this.word);
                             if (selword==this.word){
@@ -341,20 +342,19 @@ export class ExampleState extends State {
                         }
                     }
                 }
-                let myItem : BaseItem = player.privateItems["back"];
-                if (myItem){
-                    myItem.debug = true;
-                    if (myItem.collisionWithPoint(cmd.px,cmd.py)){
+                let backButton : BaseItem = player.privateItems["back"];
+                if (!selectedItem && backButton){
+                    if (backButton.collisionWithPoint(cmd.px,cmd.py)){
                         console.log("press back");
-                        selectedItem = myItem;
                         let nextKey = "mysel0";
-                        for(idx in player.privateItems){
-                            if (player.privateItems[idx].label=="" || idx=='back'){
+                        for(index=0; index<this.word.length; index++){
+                            if (player.privateItems['mysel'+index].label=="_" || idx=='back'){
                                 break;
                             }
-                            nextKey = idx;
+                            nextKey = 'mysel'+index;
                         }
-                        player.privateItems[nextKey].label='';
+                        player.privateItems[nextKey].label='_';
+                        player.privateItems[nextKey].bgcolor='#fff';
                     }
                 }
                 
@@ -425,6 +425,23 @@ export class ExampleState extends State {
             fontSize: 24,
             type: 'temp'
         })
+        const sep = 110;
+        for(idx in this.palette){
+            const pos1 = (sep*(idx%7))+140;
+            player.privateItems["color"+idx]=this.item({
+                x:pos1,
+                y:idx>=7 ? 940:820,
+                width: 80,
+                radius: 0,
+                height: 100,
+                borderRadius: 8,
+                bgcolor: this.palette[idx],
+                type: 'temp',
+                label: ' ',
+                fontSize: 40,
+            })
+        }
+
         console.log("notify",player.name);        
         return this.currentId;
     }

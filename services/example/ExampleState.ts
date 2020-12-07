@@ -568,6 +568,9 @@ export class ExampleState extends State {
                 this.currentId='';
                 this.stopClues();
                 this.resetDrawing();
+                for(var idp in this.players){
+                    this.resetPlayer(this.players[idp]);
+                }
             }
         }
     }

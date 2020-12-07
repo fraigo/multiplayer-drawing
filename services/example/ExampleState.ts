@@ -47,6 +47,11 @@ export class ExampleState extends State {
     words : any = new Words();
     language : any = new Lang();
     lang : string = "en";
+    turnTime : Date = new Date();
+    timeout1 : NodeJS.Timeout = null;
+    timeout2 : NodeJS.Timeout = null;
+    timeout3 : NodeJS.Timeout = null;
+    playerPoints : number = 0;
 
     getWord(lang){
         let words=this.words[lang];
@@ -83,6 +88,18 @@ export class ExampleState extends State {
     }
 
     start(){
+        this.ui['clue']=this.item({
+            x:500,
+            y:50,
+            width: 400,
+            height: 30,
+            borderRadius: 8,
+            label: "",
+            bgcolor: "#fff8",
+            type: 'clue',
+            fontSize: 36,
+            visible: false,
+        });
     }
 
     resetDrawing(){
@@ -251,6 +268,7 @@ export class ExampleState extends State {
                     }
                 }
                 if (selectedItem!=null){
+                    player.x0=-1;
                     return;
                 }
                 //console.log("touch",cmd.px,cmd.py);
@@ -292,6 +310,7 @@ export class ExampleState extends State {
                     //console.log("release",cmd.px,cmd.py);
                     this.drawItem(cmd.px,cmd.py,player);   
                 }
+                player.x0=-1;
             }
         }else if(this.currentId!=''){
             if (cmd.type=="release"){
@@ -370,13 +389,17 @@ export class ExampleState extends State {
                     delete player.privateItems.myturn;
                     delete this.ui.win;
                     delete this.ui.word;
-                    this.nextTurn(id);
+                    setTimeout(()=>{
+                        this.nextTurn(id);
+                    },500);
                 }
             }
         }
     }
 
     nextTurn(id: string){
+        this.turnTime = new Date();
+        this.playerPoints = 100;
         this.resetDrawing();
         this.nextWord();
         let idx: any;
@@ -385,6 +408,44 @@ export class ExampleState extends State {
             this.setupPlayer(this.players[idx]);
         }
         this.nextPlayer(id);
+        this.ui['clue'].label = '';
+        this.ui['clue'].visible = false;
+        if (this.timeout1){
+            clearTimeout(this.timeout1);
+            clearTimeout(this.timeout2);
+            clearTimeout(this.timeout3);
+        }
+        this.timeout1 = setTimeout(()=>{
+            let word1 = this.word.replace(/./g,'_ ');
+            let index = 0;
+            let replacement = this.word.charAt(index);
+            word1 = word1.substring(0, index) + replacement + word1.substring(index + 1)
+            this.ui['clue'].label = word1;
+            this.ui['clue'].visible = true;
+            this.playerPoints-=20;
+        },20000)
+        this.timeout2 = setTimeout(()=>{
+            let word1 = this.ui['clue'].label;
+            let index = Math.round(this.word.length/2);
+            let replacement = this.word.charAt(index);
+            index*=2;
+            word1 = word1.substring(0, index) + replacement + word1.substring(index + 1)
+            this.ui['clue'].label = word1;
+            this.ui['clue'].visible = true;
+            this.playerPoints-=10;
+        },30000)
+        this.timeout3 = setTimeout(()=>{
+            if (this.word.length>4){
+                let word1 = this.ui['clue'].label;
+                let index = Math.round(this.word.length-1);
+                let replacement = this.word.charAt(index);
+                index*=2;
+                word1 = word1.substring(0, index) + replacement + word1.substring(index + 1)
+                this.ui['clue'].label = word1;
+                this.ui['clue'].visible = true;
+                this.playerPoints-=10;    
+            }
+        },40000)
     }
 
     nextId(){
@@ -421,8 +482,7 @@ export class ExampleState extends State {
             x:500,
             y:50,
             width: 400,
-            height: 30,
-            radius: 0,
+            height: 38,
             borderRadius: 10,
             bgcolor: "#8f8",
             label: this.language[this.lang].your_turn,

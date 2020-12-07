@@ -79,8 +79,11 @@ function changeUsername(user){
   }else{
     step2.style.display='none';
   }
-
 }
+
+changeUsername(playerName);
+
+
 
 function showRooms(){
   client.getAvailableRooms('example', function(rooms, err) {
@@ -268,10 +271,10 @@ function joinRoom(room){
         }
       }
     }
-    ctx.fillStyle = "#fff";
+    ctx.fillStyle = "#000A";
     ctx.font = "20px Arial";
     ctx.textAlign = "center";
-    ctx.fillText(room.id,500,30);
+    ctx.fillText("Game ID: "+room.id,500,24);
   }
 
   function triggerDraw(){

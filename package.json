@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon --watch '**/*.ts' --exec ts-node index.ts",
-    "heroku-postbuild": "npm run build"
+    "heroku-postbuild": "npm run build",
+    "patch" : "npm version patch && git describe --tags --abbrev=0 > static/version.txt"
   },
   "engines": {
     "node": "8.9.1"

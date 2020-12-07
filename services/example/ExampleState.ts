@@ -52,6 +52,7 @@ export class ExampleState extends State {
     timeout2 : NodeJS.Timeout = null;
     timeout3 : NodeJS.Timeout = null;
     playerPoints : number = 0;
+    drawerPoints : number = 0;
 
     getWord(lang){
         let words=this.words[lang];
@@ -239,9 +240,6 @@ export class ExampleState extends State {
     updatePlayer (id: string, cmd: any) {
         var player=this.players[id];
         //console.log("Update player",player.index, cmd.type);
-        if (cmd.type=="notified"){
-            player.notify();
-        }
         if (cmd.idle==1){
             return;
         }
@@ -339,13 +337,13 @@ export class ExampleState extends State {
                             selword+=selCard.label;
                             console.log('SELWORD',selword,this.word);
                             if (selword==this.word){
-                                this.square('win',300,380,400,220,"#fffA",20,player.name+" "+this.language[this.lang].wins);
+                                this.square('win',300,380,400,220,"#fffc",20,player.name+" "+this.language[this.lang].wins);
                                 this.ui['win'].stroke='#ccc';
                                 this.square('word',400,410,200,40,"#ff0",14,this.word);
                                 let currentPlayer = this.players[this.currentId];
-                                currentPlayer.score+=50;
+                                currentPlayer.score+=this.drawerPoints;
                                 this.currentId='';
-                                player.score+=100;
+                                player.score+=this.playerPoints;
                                 this.updatePlayerUi();
                                 player.privateItems['myturn']=this.item({
                                     x:500,
@@ -358,6 +356,7 @@ export class ExampleState extends State {
                                     fontSize: 40,
                                     borderRadius: 10,
                                 })
+                                this.stopClues();
                             }
                             break;
                         }else{
@@ -397,9 +396,21 @@ export class ExampleState extends State {
         }
     }
 
+    stopClues(){
+        if (this.timeout1){
+            clearTimeout(this.timeout1);
+            clearTimeout(this.timeout2);
+            clearTimeout(this.timeout3);
+        }
+        this.timeout1 = null;
+        this.timeout2 = null;
+        this.timeout3 = null;
+    }
+
     nextTurn(id: string){
         this.turnTime = new Date();
         this.playerPoints = 100;
+        this.drawerPoints = 50;
         this.resetDrawing();
         this.nextWord();
         let idx: any;
@@ -410,11 +421,7 @@ export class ExampleState extends State {
         this.nextPlayer(id);
         this.ui['clue'].label = '';
         this.ui['clue'].visible = false;
-        if (this.timeout1){
-            clearTimeout(this.timeout1);
-            clearTimeout(this.timeout2);
-            clearTimeout(this.timeout3);
-        }
+        this.stopClues();
         this.timeout1 = setTimeout(()=>{
             let word1 = this.word.replace(/./g,'_ ');
             let index = 0;
@@ -423,17 +430,19 @@ export class ExampleState extends State {
             this.ui['clue'].label = word1;
             this.ui['clue'].visible = true;
             this.playerPoints-=20;
-        },20000)
+            this.drawerPoints-=5;
+        },30000)
         this.timeout2 = setTimeout(()=>{
             let word1 = this.ui['clue'].label;
-            let index = Math.round(this.word.length/2);
+            let index = Math.round(this.word.length-1/2);
             let replacement = this.word.charAt(index);
             index*=2;
             word1 = word1.substring(0, index) + replacement + word1.substring(index + 1)
             this.ui['clue'].label = word1;
             this.ui['clue'].visible = true;
             this.playerPoints-=10;
-        },30000)
+            this.drawerPoints-=10;
+        },40000)
         this.timeout3 = setTimeout(()=>{
             if (this.word.length>4){
                 let word1 = this.ui['clue'].label;
@@ -444,8 +453,9 @@ export class ExampleState extends State {
                 this.ui['clue'].label = word1;
                 this.ui['clue'].visible = true;
                 this.playerPoints-=10;    
+                this.drawerPoints-=10;
             }
-        },40000)
+        },50000)
     }
 
     nextId(){
@@ -467,7 +477,6 @@ export class ExampleState extends State {
         this.currentId=id;
         this.updatePlayerUi();
         var player = this.getPlayer(this.currentId);
-        player.notify("It's your turn");
         let idx: any;
         for(idx in this.realLetters){
             player.privateItems["mysel"+idx].label=this.realLetters[idx];
@@ -508,7 +517,6 @@ export class ExampleState extends State {
             })
         }
 
-        console.log("notify",player.name);        
         return this.currentId;
     }
 

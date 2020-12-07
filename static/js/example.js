@@ -12,13 +12,21 @@ if (document.location.hash=="#en"){
   lang="en"
 }
 
+console.log("LANG",lang);
+
+
+
 var language={
   en:{
+    "_name" : "🇬🇧 English",
+    "_flag" : "🇬🇧",
     "enter_your_name":"Name",
     "select_game":"Select a Game",
     "create_game":"Create New Game",
   },
   es:{
+    "_name" : "🇪🇸 Español",
+    "_flag" : "🇪🇸",
     "enter_your_name":"Nombre",
     "select_game":"Selecciona Juego",
     "create_game":"Crear Nuevo Juego",
@@ -95,12 +103,25 @@ function showRooms(){
       return room.clients<room.maxClients && room.metadata.opened;
     })
     .map(function(room){
-      return "<button onclick=selectGame('"+room.roomId+"') >"+room.roomId+" ("+room.clients+"/"+room.maxClients+")</button>"
+      return "<button onclick=selectGame('"+room.roomId+"') >"+language[room.metadata.lang]._flag+" "+room.roomId+" ["+room.clients+"/"+room.maxClients+"]</button>"
     })
-    items.push("<button onclick=createGame() >"+language[lang].create_game+"</div>")
+    items.push("<p>&nbsp;</p>");
+    items.push("<button onclick=createGame() >"+language[lang].create_game+"</button>")
+    items.push("<select size=1 id=gamelang onchange='setLang(this.value)' >");
+    items.push("<option value="+lang+" selected >"+language[lang]._name+"</option>");
+    for(var lng in language){
+      if (lng!=lang){
+        items.push("<option value="+lng+" >"+language[lng]._name+"</option>");
+      }
+    }
+    items.push("</select>")
     document.querySelector("#game-ui .ui-selection").innerHTML=(items.join("\n"))
   });
   setTimeout(showRooms,3000);
+}
+
+function setLang(lang){
+  this.lang = lang;
 }
 
 var currentRoom;
@@ -224,7 +245,6 @@ function joinRoom(room){
   
   var players = {};
   var myPlayer;
-  var lastNotification = 0;
 
   var items = [];
   var ui = [];
@@ -337,16 +357,6 @@ function joinRoom(room){
     }
   
     room.state.players.onChange = function (player, sessionId) {
-      if (player.notificationId!=lastNotification && player.notification!='' && sessionId==currentSession){
-        var notif=player.notification;
-        lastNotification=player.notificationId;
-        room.send({
-          type:'notified',
-          id: lastNotification
-        })
-        console.log("Notify",notif);
-        console.log(players);
-      }
       triggerDraw();
     }
   })

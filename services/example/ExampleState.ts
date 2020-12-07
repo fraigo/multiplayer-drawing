@@ -534,9 +534,19 @@ export class ExampleState extends State {
         if (this.currentId!=''){
             var player = this.getPlayer(this.currentId);
             if (player){
-                this.ui["player"+player.UUID].label+=" ◉";
+                if (Math.random()*10>7){
+                    this.ui["player"+player.UUID].label+=" ✎";
+                } else if (Math.random()*10<4){
+                    this.ui["player"+player.UUID].label+=" ✏︎";
+                }else{
+                    this.ui["player"+player.UUID].label+=" ✎.";
+                }
+                
             }
         }
+        setTimeout(()=>{
+            this.updatePlayerUi();
+        },3000);
     }
 
     getPlayer (id:string) : ExamplePlayer{

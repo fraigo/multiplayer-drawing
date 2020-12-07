@@ -1,5 +1,5 @@
-
 var lang="en";
+var appVersion="";
 
 if (navigator.language.indexOf("es-")){
   lang="es";
@@ -456,4 +456,12 @@ window.addEventListener("touchmove",function(ev){
 })
 
 
-fetch("package.")
+fetch("version.txt")
+  .then(function(response){
+    return response.text();
+  })
+  .then(function(text){
+    appVersion = text.trim();
+    console.log("Version",appVersion);
+    document.getElementById("versionInfo").innerHTML=appVersion;
+  })

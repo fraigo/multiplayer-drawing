@@ -109,3 +109,13 @@ body, input, button, select, textarea {
 #move-up, #move-down{
     width: 100%;
 }
+
+#versionInfo{
+    display: block;
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    color: #fff;
+    padding: 3px;
+    font-size: 12px;
+}

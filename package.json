@@ -1,6 +1,6 @@
 {
   "name": "colyseus-gameroom",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Colyseus Game Server",
   "main": "index.js",
   "scripts": {

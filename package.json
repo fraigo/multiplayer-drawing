@@ -1,12 +1,12 @@
 {
   "name": "colyseus-gameroom",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Colyseus Game Server",
   "main": "index.js",
   "scripts": {
     "start": "nodemon --watch '**/*.ts' --exec ts-node index.ts",
     "heroku-postbuild": "npm run build",
-    "patch" : "npm version patch && git describe --tags --abbrev=0 > static/version.txt"
+    "patch": "npm version patch && git describe --tags --abbrev=0 > static/version.txt"
   },
   "engines": {
     "node": "8.9.1"

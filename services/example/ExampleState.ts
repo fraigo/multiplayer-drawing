@@ -549,9 +549,16 @@ export class ExampleState extends State {
         super.removePlayer(id);
         this.updatePlayerUi();
         if (this.currentId==id){
-            this.nextPlayer(this.nextId());
+            this.currentId='';
+            if (Object.keys(this.players).length>1){
+                this.nextTurn(this.nextId());
+            }
         }else{
-
+            if (Object.keys(this.players).length<=1){
+                this.currentId='';
+                this.stopClues();
+                this.resetDrawing();
+            }
         }
     }
 

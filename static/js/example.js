@@ -23,6 +23,7 @@ var language={
     "enter_your_name":"Name",
     "select_game":"Select a Game",
     "create_game":"Create New Game",
+    "view_all": "View all options"
   },
   es:{
     "_name" : "🇪🇸 Español",
@@ -30,6 +31,7 @@ var language={
     "enter_your_name":"Nombre",
     "select_game":"Selecciona Juego",
     "create_game":"Crear Nuevo Juego",
+    "view_all": "Ver todo"
   }
 }
 
@@ -46,7 +48,7 @@ var PI2=2*Math.PI;
 
 var playerName = document.getElementById("playername");
 playerName.focus();
-playerName.value=localStorage.lastUser?localStorage.lastUser:'';
+playerName.value=localStorage.lastUser?localStorage.lastUser:'player'+Math.round(Math.random()*900+100);
 playerName.addEventListener("keyup",function(ev){
   localStorage.lastUser=playerName.value;
 })
@@ -58,6 +60,7 @@ client.onOpen.add(function() {
   document.querySelector("#game-ui").style.display='';
   document.querySelector("#game").style.visibility='hidden';
   showRooms();
+  autoloadGame();
 });
 
 var spritesLeft = Object.keys(sprites).length; 
@@ -92,29 +95,45 @@ function changeUsername(user){
 changeUsername(playerName);
 
 
+function sortRooms(a, b) {
+  var hash=document.location.hash.replace("#","");
+  console.log("sort",a,b,hash);
+  if (a.roomId==hash) {
+    return -1;
+  }
+  if (b.roomId==hash) {
+    return 1;
+  }
+  return 0;
+}
 
 function showRooms(){
   client.getAvailableRooms('example', function(rooms, err) {
     if (rooms.length==0){
 
     }
+    rooms.sort(sortRooms);
     var items = rooms
     .filter(function(room){
       return room.clients<room.maxClients && room.metadata.opened;
     })
     .map(function(room){
-      return "<button onclick=selectGame('"+room.roomId+"') >"+language[room.metadata.lang]._flag+" "+room.roomId+" ["+room.clients+"/"+room.maxClients+"]</button>"
+      return "<button selected='"+(document.location.hash.replace("#","")==room.roomId)+"' onclick=selectGame('"+room.roomId+"') >"+language[room.metadata.lang]._flag+" "+room.roomId+" ["+room.clients+"/"+room.maxClients+"]</button>"
     })
-    items.push("<p>&nbsp;</p>");
-    items.push("<button onclick=createGame() >"+language[lang].create_game+"</button>")
-    items.push("<select size=1 id=gamelang onchange='setLang(this.value)' >");
-    items.push("<option value="+lang+" selected >"+language[lang]._name+"</option>");
-    for(var lng in language){
-      if (lng!=lang){
-        items.push("<option value="+lng+" >"+language[lng]._name+"</option>");
+    if (rooms.length==0 || document.location.hash.replace("#","")!=rooms[0].roomId){
+      items.push("<p>&nbsp;</p>");
+      items.push("<button onclick=createGame() >"+language[lang].create_game+"</button>")
+      items.push("<select size=1 id=gamelang onchange='setLang(this.value)' >");
+      items.push("<option value="+lang+" selected >"+language[lang]._name+"</option>");
+      for(var lng in language){
+        if (lng!=lang){
+          items.push("<option value="+lng+" >"+language[lng]._name+"</option>");
+        }
       }
+      items.push("</select>")
+    }else{
+      items.push("<button onclick=document.location='./' >"+language[lang].view_all+"</button>")
     }
-    items.push("</select>")
     document.querySelector("#game-ui .ui-selection").innerHTML=(items.join("\n"))
   });
   setTimeout(showRooms,3000);
@@ -132,7 +151,6 @@ function createGame(){
   document.title=userName;
   document.querySelector("#game-ui").style.display='none';
   document.querySelector("#game").style.visibility='';
-
 }
 
 function selectGame(id){
@@ -308,6 +326,7 @@ function joinRoom(room){
     console.log("Joined to game",room.id, room.name, room.sessionId);
     currentSession = room.sessionId;
     sendIdleKey(room);
+    document.location="#"+(room.id);
 
     // listen to patches coming from the server
     room.state.players.onAdd = function(player, sessionId) {
@@ -465,3 +484,17 @@ fetch("version.txt")
     console.log("Version",appVersion);
     document.getElementById("versionInfo").innerHTML=appVersion;
   })
+
+function autoloadGame(){
+  var hash=document.location.hash.replace("#","");
+  if (hash!=""){
+    client.getAvailableRooms('example', function(rooms, err) {
+      for(var i=0; i<rooms.length; i++){
+        if (rooms[i].roomId==hash){
+          console.log(rooms[i]);
+          //selectGame(hash);
+        }
+      }
+    })
+  }
+}

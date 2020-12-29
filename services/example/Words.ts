@@ -56,7 +56,7 @@ export class Words  {
         "bicicleta",
         "moto",
         "camion",
-        "auto",
+        "automovil",
         "avion",
         "bus",
         "helicoptero",

@@ -16,6 +16,15 @@ body, input, button, select, textarea {
     font-family: Arial, Helvetica, sans-serif;
 }
 
+#game-ui button[selected='true']{
+    background-color: #fff !important;
+    margin-bottom: 20px;
+    height: 40px;
+}
+
+div.view_more{
+    display: none;
+}
 .no-selection{
   -webkit-user-select: none; /* Chrome all / Safari all */
   -moz-user-select: none;   /* Firefox all */

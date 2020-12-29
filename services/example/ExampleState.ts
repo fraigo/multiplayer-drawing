@@ -57,7 +57,7 @@ export class ExampleState extends State {
     getWord(lang){
         let words=this.words[lang];
         let idx=Math.round(Math.random()*(words.length-1));
-        console.log('selection',idx,words.length)
+        //console.log('selection',idx,words.length)
         return words[idx];
     }
     
@@ -76,7 +76,7 @@ export class ExampleState extends State {
             }
             tries++;
         }
-        console.log(wordLetters,letters);
+        //console.log(wordLetters,letters);
         return letters;
     }
 
@@ -324,16 +324,16 @@ export class ExampleState extends State {
                 }
                 let index : number;
                 if (selectedItem){
-                    console.log("press",selectedItem.label, id);
+                    //console.log("press",selectedItem.label, id);
                     let selword = "";
                     for(index=0; index<this.word.length; index++){
                         const selCard=player.privateItems["mysel"+index];
                         selCard.bgcolor="#ffe";
-                        console.log("mysel"+index,selCard.label,selCard.x);
+                        //console.log("mysel"+index,selCard.label,selCard.x);
                         if (selCard.label=="_"){
                             selCard.label=selectedItem.label;
                             selCard.bgcolor="#ffc";
-                            console.log('upd',selCard.label,selCard.bgcolor);
+                            //console.log('upd',selCard.label,selCard.bgcolor);
                             selword+=selCard.label;
                             console.log('SELWORD',selword,this.word);
                             if (selword==this.word){

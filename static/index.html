@@ -1,12 +1,45 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
+<html>
+  <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Index</title>
-</head>
-<body>
-    <script>document.location='example.html';</script>
-</body>
+    <!-- colyseus.js client -->
+    <script type="text/javascript" src="js/colyseus.js"></script>
+    <link rel="stylesheet" href="css/example.css">
+    <title>Multiplayer Drawing Example</title>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-S3L3TYS1RX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-S3L3TYS1RX');
+    </script>
+  </head>
+  <body class="no-selection">
+    <div id="canvas-container">
+      <div id="move-controls" class="btn-container" style="display:none">
+        <div class="btn" id="move-up"><span> </span></div>
+        <div class="btn" id="move-left"><span> </span></div><div class="btn" id="move-right"><span> </span></div>
+        <div class="btn" id="move-down"><span> </span></div>
+      </div>
+      <canvas id="game" width="1000" height="1000" ></canvas>
+      <div id="game-ui">
+        <div class="ui-container">
+            <h3 id="enter_your_name">Enter your name</h3>
+            <input autofocus id="playername" autocomplete="off" onclick="changeUsername(this)" onkeyup="changeUsername(this)" maxlength="10">
+            <div id="step2" style="display: none;">
+                <h3 id="select_game">Select game</h3>
+                <div class="ui-selection">
+                </div>    
+            </div>
+        </div>
+      </div>
+      <div id="versionInfo"></div>
+    </div>
+    
+    <script src="js/sprites.js?20201228"></script>
+    <script src="js/example.js?20201228"></script>
+  </body>
 </html>

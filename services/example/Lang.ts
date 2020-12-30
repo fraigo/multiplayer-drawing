@@ -14,7 +14,7 @@ export class Lang  {
         "wins" : "Gana",
         "my_turn" : "Mi Turno",
         "waiting_players" : "Esperando jugadores...",
-        "undo" : "Borrar",
+        "undo" : "Deshacer",
         "clear": "Borrar"
     }
 }

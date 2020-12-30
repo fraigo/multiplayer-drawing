@@ -343,9 +343,13 @@ export class ExampleState extends State {
                 }
                 let clearItem = player.privateItems["clear"];
                 if (clearItem.collisionWithPoint(cmd.px,cmd.py)){
-                    console.log('undo');
-                    this.undoDrawing();
+                    this.resetDrawing();
                     selectedItem=clearItem;
+                }
+                let undoItem = player.privateItems["undo"];
+                if (undoItem.collisionWithPoint(cmd.px,cmd.py)){
+                    this.undoDrawing();
+                    selectedItem=undoItem;
                 }
                 if (selectedItem!=null){
                     player.x0=-1;
@@ -595,17 +599,27 @@ export class ExampleState extends State {
             type: 'temp'
         })
         player.privateItems["clear"]=this.item({
-            x:940,
+            x:920,
             y:50,
-            width: 80,
+            width: 120,
             height: 40,
             borderRadius: 10,
-            bgcolor: "#ff8",
-            stroke: "#ff4",
-            label: this.language[this.lang].undo,
+            bgcolor: "#ff4",
+            label: this.language[this.lang].clear,
             fontSize: 24,
             type: 'temp'
         })
+        player.privateItems["undo"]=this.item({
+            x:920,
+            y:120,
+            width: 120,
+            height: 40,
+            borderRadius: 10,
+            bgcolor: "#ffa",
+            label: this.language[this.lang].undo,
+            fontSize: 24,
+            type: 'temp'
+        })        
         const sep = 110;
         for(idx in this.palette){
             const pos1 = (sep*(idx%7))+140;

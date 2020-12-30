@@ -26,9 +26,17 @@ export class Words  {
         "truck",
         "car",
         "airplane",
+        "boat",
         "bus",
+        "tank",
         "helicopter",
         "rocket",
+        "phone",
+        "oven",
+        "pot",
+        "knife",
+        "spoon",
+        "pan",
     ];
 
     es : Array<string> = [
@@ -58,8 +66,17 @@ export class Words  {
         "camion",
         "automovil",
         "avion",
+        "bote",
         "bus",
+        "tanque",
         "helicoptero",
         "cohete",
+        "telefono",
+        "horno",
+        "olla",
+        "cuchillo",
+        "cuchara",
+        "sarten",
+        ""
     ]
 }

@@ -61,7 +61,7 @@ export class BaseRoom<T = State> extends Room<T> {
         if (Config.DEBUG && data && !data.idle) {
             console.log(client.sessionId, ":", data);
         }
-        this.state.updatePlayer(client.sessionId, data);
+        this.state.updatePlayer(client.sessionId, data, this);
         this.metadata.opened = this.state.opened;
     }
 

@@ -355,7 +355,11 @@ function joinRoom(room){
     }
 
     room.state.ui.onAdd = function(item, sessionId) {
-      
+      if (item.type=='finish'){
+        setTimeout(function(){
+          document.location='./';
+        },3000);
+      }
       ui.push(item);
       triggerDraw();
     }

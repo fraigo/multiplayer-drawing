@@ -53,14 +53,23 @@ export class ExampleState extends State {
     timeout3 : NodeJS.Timeout = null;
     playerPoints : number = 0;
     drawerPoints : number = 0;
+    selectedWords : Array<string> = [];
 
     startTime : number = 0;
 
     getWord(lang){
         let words=this.words[lang];
-        let idx=Math.round(Math.random()*(words.length-1));
-        //console.log('selection',idx,words.length)
-        return words[idx];
+        let idx;
+        do {
+            if (this.selectedWords.length==words.length){
+                return null;
+            }
+            idx=Math.round(Math.random()*(words.length-1));
+            //console.log('check word',words[idx],this.selectedWords);
+        } while (this.selectedWords.indexOf(words[idx])>=0);
+        let newWord = words[idx];
+        this.selectedWords.push(newWord);
+        return newWord;
     }
     
     getLetters(word: string): Array<string>{
@@ -83,11 +92,42 @@ export class ExampleState extends State {
     }
 
     nextWord(){
-        this.word = this.getWord(this.lang);
-        console.log("WORD",this.word);    
+        let newWord = this.getWord(this.lang);
+        console.log("WORD",newWord);
+        if (newWord==null){
+            let player = null;
+            let playerMax = 0;
+            for(let key in this.players){
+                if (this.players[key].score>playerMax){
+                    player = this.players[key];
+                    playerMax = player.score;
+                }
+            }
+            this.finishGame(player);
+            return false;
+        }
+        this.word = newWord;
         this.realLetters = this.word.split("");
         this.currentLetters = this.realLetters.concat([]);
         this.selLetters = this.getLetters(this.word);
+        return true;
+    }
+
+    finishGame(player){
+        this.square('win',300,380,400,220,"#fffc",20,player.name+" "+player.score+" points");
+        this.ui['win'].stroke='#ccc';
+        this.ui['finish']=this.item({
+            type:'finish',
+            x:500,
+            y:560,
+            width:260,
+            height: 50,
+            label: player.name+" "+this.language[this.lang].wins,
+            bgcolor: "#4F4",
+            stroke: "#080",
+            fontSize: 40,
+            borderRadius: 10,
+        })
     }
 
     start(){
@@ -103,17 +143,19 @@ export class ExampleState extends State {
             fontSize: 36,
             visible: false,
         });
-        this.ui['waiting']=this.item({
-            x:500,
-            y:750,
-            width: 400,
-            height: 40,
-            borderRadius: 8,
-            label: "Waiting for players...",
-            bgcolor: "#ff8",
-            type: 'clue',
-            fontSize: 36,
-        });
+        if (!this.ui.waiting){
+            this.ui['waiting']=this.item({
+                x:500,
+                y:750,
+                width: 400,
+                height: 40,
+                borderRadius: 8,
+                label: "Waiting for players...",
+                bgcolor: "#ff8",
+                type: 'clue',
+                fontSize: 36,
+            });
+        }
         this.startTime = (new Date()).getTime();
     }
 
@@ -251,7 +293,7 @@ export class ExampleState extends State {
         this.items[item.id]=item;
     }
 
-    updatePlayer (id: string, cmd: any) {
+    updatePlayer (id: string, cmd: any, room: any) {
         var player=this.players[id];
         //console.log("Update player",player.index, cmd.type);
         if (cmd.idle==1){
@@ -351,25 +393,37 @@ export class ExampleState extends State {
                             selword+=selCard.label;
                             console.log('SELWORD',selword,this.word);
                             if (selword==this.word){
-                                this.square('win',300,380,400,220,"#fffc",20,player.name+" "+this.language[this.lang].wins);
-                                this.ui['win'].stroke='#ccc';
-                                this.square('word',400,410,200,40,"#ff0",14,this.word);
                                 let currentPlayer = this.players[this.currentId];
                                 currentPlayer.score+=this.drawerPoints;
                                 this.currentId='';
                                 player.score+=this.playerPoints;
                                 this.updatePlayerUi();
-                                player.privateItems['myturn']=this.item({
-                                    x:500,
-                                    y:560,
-                                    width:260,
-                                    height: 50,
-                                    label: this.language[this.lang].my_turn,
-                                    bgcolor: "#4F4",
-                                    stroke: "#080",
-                                    fontSize: 40,
-                                    borderRadius: 10,
-                                })
+                                console.log("CHECK",this.selectedWords.length,this.words[this.lang].length);
+                                let maxScore = 1500;
+                                let moreWords=this.selectedWords.length!=this.words[this.lang].length;
+                                if (moreWords && player.score<maxScore && currentPlayer.score<maxScore){
+                                    this.square('win',300,380,400,220,"#fffc",20,player.name+" "+this.language[this.lang].wins);
+                                    this.ui['win'].stroke='#ccc';
+                                    this.square('word',400,410,200,40,"#ff0",14,this.word);
+                                        player.privateItems['myturn']=this.item({
+                                        x:500,
+                                        y:560,
+                                        width:260,
+                                        height: 50,
+                                        label: this.language[this.lang].my_turn,
+                                        bgcolor: "#4F4",
+                                        stroke: "#080",
+                                        fontSize: 40,
+                                        borderRadius: 10,
+                                    })
+                                }else{
+                                    room.metadata.opened=false;
+                                    if (!moreWords || player.score>=maxScore){
+                                        this.finishGame(player);
+                                    }else{
+                                        this.finishGame(currentPlayer);
+                                    }
+                                }
                                 this.stopClues();
                             }
                             break;
@@ -405,6 +459,7 @@ export class ExampleState extends State {
                     setTimeout(()=>{
                         this.nextTurn(id);
                     },500);
+                    return;
                 }
             }
         }
@@ -426,51 +481,52 @@ export class ExampleState extends State {
         this.playerPoints = 100;
         this.drawerPoints = 50;
         this.resetDrawing();
-        this.nextWord();
-        let idx: any;
-        for(idx in this.players){
-            this.resetPlayer(this.players[idx]);
-            this.setupPlayer(this.players[idx]);
-        }
-        this.nextPlayer(id);
-        this.ui['clue'].label = '';
-        this.ui['clue'].visible = false;
-        this.stopClues();
-        this.ui['waiting'].visible = false;
-        this.timeout1 = setTimeout(()=>{
-            let word1 = this.word.replace(/./g,'_ ');
-            let index = 0;
-            let replacement = this.word.charAt(index);
-            word1 = word1.substring(0, index) + replacement + word1.substring(index + 1)
-            this.ui['clue'].label = word1;
-            this.ui['clue'].visible = true;
-            this.playerPoints-=20;
-            this.drawerPoints-=5;
-        },30000)
-        this.timeout2 = setTimeout(()=>{
-            let word1 = this.ui['clue'].label;
-            let index = Math.round(this.word.length-1/2);
-            let replacement = this.word.charAt(index);
-            index*=2;
-            word1 = word1.substring(0, index) + replacement + word1.substring(index + 1)
-            this.ui['clue'].label = word1;
-            this.ui['clue'].visible = true;
-            this.playerPoints-=10;
-            this.drawerPoints-=10;
-        },40000)
-        this.timeout3 = setTimeout(()=>{
-            if (this.word.length>4){
+        if (this.nextWord()){
+            let idx: any;
+            for(idx in this.players){
+                this.resetPlayer(this.players[idx]);
+                this.setupPlayer(this.players[idx]);
+            }
+            this.nextPlayer(id);
+            this.ui['clue'].label = '';
+            this.ui['clue'].visible = false;
+            this.stopClues();
+            this.ui['waiting'].visible = false;
+            this.timeout1 = setTimeout(()=>{
+                let word1 = this.word.replace(/./g,'_ ');
+                let index = 0;
+                let replacement = this.word.charAt(index);
+                word1 = word1.substring(0, index) + replacement + word1.substring(index + 1)
+                this.ui['clue'].label = word1;
+                this.ui['clue'].visible = true;
+                this.playerPoints-=20;
+                this.drawerPoints-=5;
+            },30000)
+            this.timeout2 = setTimeout(()=>{
                 let word1 = this.ui['clue'].label;
-                let index = Math.round(this.word.length-1);
+                let index = Math.round(this.word.length-1/2);
                 let replacement = this.word.charAt(index);
                 index*=2;
                 word1 = word1.substring(0, index) + replacement + word1.substring(index + 1)
                 this.ui['clue'].label = word1;
                 this.ui['clue'].visible = true;
-                this.playerPoints-=10;    
+                this.playerPoints-=10;
                 this.drawerPoints-=10;
-            }
-        },50000)
+            },40000)
+            this.timeout3 = setTimeout(()=>{
+                if (this.word.length>4){
+                    let word1 = this.ui['clue'].label;
+                    let index = Math.round(this.word.length-1);
+                    let replacement = this.word.charAt(index);
+                    index*=2;
+                    word1 = word1.substring(0, index) + replacement + word1.substring(index + 1)
+                    this.ui['clue'].label = word1;
+                    this.ui['clue'].visible = true;
+                    this.playerPoints-=10;    
+                    this.drawerPoints-=10;
+                }
+            },50000)
+        }
     }
 
     nextId(){

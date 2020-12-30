@@ -76,7 +76,7 @@ export class State extends GameState {
         this.playerCount--;
     }
 
-    updatePlayer (id: string, cmd: any) {
+    updatePlayer (id: string, cmd: any, room: any) {
         
     }
 

@@ -54,6 +54,8 @@ export class ExampleState extends State {
     playerPoints : number = 0;
     drawerPoints : number = 0;
 
+    startTime : number = 0;
+
     getWord(lang){
         let words=this.words[lang];
         let idx=Math.round(Math.random()*(words.length-1));
@@ -101,6 +103,18 @@ export class ExampleState extends State {
             fontSize: 36,
             visible: false,
         });
+        this.ui['waiting']=this.item({
+            x:500,
+            y:750,
+            width: 400,
+            height: 40,
+            borderRadius: 8,
+            label: "Waiting for players...",
+            bgcolor: "#ff8",
+            type: 'clue',
+            fontSize: 36,
+        });
+        this.startTime = (new Date()).getTime();
     }
 
     resetDrawing(){
@@ -422,6 +436,7 @@ export class ExampleState extends State {
         this.ui['clue'].label = '';
         this.ui['clue'].visible = false;
         this.stopClues();
+        this.ui['waiting'].visible = false;
         this.timeout1 = setTimeout(()=>{
             let word1 = this.word.replace(/./g,'_ ');
             let index = 0;

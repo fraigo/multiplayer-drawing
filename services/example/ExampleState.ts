@@ -56,6 +56,7 @@ export class ExampleState extends State {
     selectedWords : Array<string> = [];
 
     startTime : number = 0;
+    maxScore = 1500;
 
     getWord(lang){
         let words=this.words[lang];
@@ -143,19 +144,6 @@ export class ExampleState extends State {
             fontSize: 36,
             visible: false,
         });
-        if (!this.ui.waiting){
-            this.ui['waiting']=this.item({
-                x:500,
-                y:750,
-                width: 400,
-                height: 40,
-                borderRadius: 8,
-                label: "Waiting for players...",
-                bgcolor: "#ff8",
-                type: 'clue',
-                fontSize: 36,
-            });
-        }
         this.startTime = (new Date()).getTime();
     }
 
@@ -231,7 +219,20 @@ export class ExampleState extends State {
     initPlayer (player: ExamplePlayer){
         if (this.word==null){
             this.lang = player.lang;
-            this.nextWord();
+            if (!this.ui.waiting){
+                this.ui['waiting']=this.item({
+                    x:500,
+                    y:750,
+                    width: 400,
+                    height: 40,
+                    borderRadius: 8,
+                    label: this.language[this.lang].waiting_players,
+                    bgcolor: "#ff8",
+                    type: 'clue',
+                    fontSize: 32,
+                });
+            }
+    
         }
         console.log("Init player");
         var item=new BaseItem();
@@ -399,9 +400,8 @@ export class ExampleState extends State {
                                 player.score+=this.playerPoints;
                                 this.updatePlayerUi();
                                 console.log("CHECK",this.selectedWords.length,this.words[this.lang].length);
-                                let maxScore = 1500;
                                 let moreWords=this.selectedWords.length!=this.words[this.lang].length;
-                                if (moreWords && player.score<maxScore && currentPlayer.score<maxScore){
+                                if (moreWords && player.score<this.maxScore && currentPlayer.score<this.maxScore){
                                     this.square('win',300,380,400,220,"#fffc",20,player.name+" "+this.language[this.lang].wins);
                                     this.ui['win'].stroke='#ccc';
                                     this.square('word',400,410,200,40,"#ff0",14,this.word);
@@ -418,7 +418,7 @@ export class ExampleState extends State {
                                     })
                                 }else{
                                     room.metadata.opened=false;
-                                    if (!moreWords || player.score>=maxScore){
+                                    if (!moreWords || player.score>=this.maxScore){
                                         this.finishGame(player);
                                     }else{
                                         this.finishGame(currentPlayer);

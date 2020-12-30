@@ -37,6 +37,7 @@ export class Words  {
         "knife",
         "spoon",
         "pan",
+        "grill"
     ];
 
     es : Array<string> = [
@@ -77,6 +78,6 @@ export class Words  {
         "cuchillo",
         "cuchara",
         "sarten",
-        ""
+        "parrilla"
     ]
 }

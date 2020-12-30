@@ -136,7 +136,7 @@ export class ExampleState extends State {
             x:500,
             y:50,
             width: 400,
-            height: 30,
+            height: 40,
             borderRadius: 8,
             label: "",
             bgcolor: "#fff8",
@@ -153,6 +153,25 @@ export class ExampleState extends State {
             if (this.items[idx].type=='drawing'){
                 this.items[idx].visible=false;
                 delete this.items[idx];
+            }
+        }
+    }
+
+    undoDrawing(){
+        let idx: any;
+        let keys=Object.keys(this.items);
+        let points=0;
+        for(idx=keys.length-1; idx>=0; idx--){
+            let key=keys[idx];
+            if (this.items[key].type=='drawing'){
+                if (this.items[key].stroke==""){
+                    points++;
+                }
+                this.items[key].visible=false;
+                delete this.items[key];
+                if (points==2){
+                    return;
+                }
             }
         }
     }
@@ -321,6 +340,12 @@ export class ExampleState extends State {
                         myItem.label='◉';
                         myItem.stroke='#ff0';
                     }
+                }
+                let clearItem = player.privateItems["clear"];
+                if (clearItem.collisionWithPoint(cmd.px,cmd.py)){
+                    console.log('undo');
+                    this.undoDrawing();
+                    selectedItem=clearItem;
                 }
                 if (selectedItem!=null){
                     player.x0=-1;
@@ -552,7 +577,7 @@ export class ExampleState extends State {
         for(idx in this.realLetters){
             player.privateItems["mysel"+idx].label=this.realLetters[idx];
             player.privateItems["mysel"+idx].bgcolor='#cfc';
-            player.privateItems["back"].bgcolor='#000';
+            player.privateItems["back"].visible=false;
             let idx1: any;
             for(idx1 in this.selLetters){
                 player.privateItems["sel"+idx1].visible=false;
@@ -566,6 +591,18 @@ export class ExampleState extends State {
             borderRadius: 10,
             bgcolor: "#8f8",
             label: this.language[this.lang].your_turn,
+            fontSize: 24,
+            type: 'temp'
+        })
+        player.privateItems["clear"]=this.item({
+            x:940,
+            y:50,
+            width: 80,
+            height: 40,
+            borderRadius: 10,
+            bgcolor: "#ff8",
+            stroke: "#ff4",
+            label: this.language[this.lang].undo,
             fontSize: 24,
             type: 'temp'
         })

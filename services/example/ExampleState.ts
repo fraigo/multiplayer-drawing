@@ -47,16 +47,18 @@ export class ExampleState extends State {
     words : any = new Words();
     language : any = new Lang();
     lang : string = "en";
-    turnTime : Date = new Date();
+    turnStart : number = 0;
+    turnLap : number = 0;
     timeout1 : NodeJS.Timeout = null;
     timeout2 : NodeJS.Timeout = null;
     timeout3 : NodeJS.Timeout = null;
+    timeout4 : NodeJS.Timeout = null;
     playerPoints : number = 0;
     drawerPoints : number = 0;
     selectedWords : Array<string> = [];
 
     startTime : number = 0;
-    maxScore = 1500;
+    maxScore = 1000;
 
     getWord(lang){
         let words=this.words[lang];
@@ -132,18 +134,35 @@ export class ExampleState extends State {
     }
 
     start(){
-        this.ui['clue']=this.item({
-            x:500,
-            y:50,
-            width: 400,
-            height: 40,
-            borderRadius: 8,
-            label: "",
-            bgcolor: "#fff8",
-            type: 'clue',
-            fontSize: 36,
-            visible: false,
-        });
+        if (!this.ui.clue){
+            this.ui['clue']=this.item({
+                x:500,
+                y:50,
+                width: 400,
+                height: 40,
+                borderRadius: 8,
+                label: "",
+                bgcolor: "#fff8",
+                type: 'clue',
+                fontSize: 36,
+                visible: false,
+            });
+        }
+        if (!this.ui.timer){
+            this.ui['timer']=this.item({
+                x:950,
+                y:950,
+                width: 80,
+                height: 80,
+                borderRadius: 40,
+                label: "60",
+                bgcolor: "#000A",
+                type: 'timer',
+                fontSize: 30,
+                fontColor: "#fff",
+                visible: false,
+            });
+        }
         this.startTime = (new Date()).getTime();
     }
 
@@ -316,6 +335,22 @@ export class ExampleState extends State {
     updatePlayer (id: string, cmd: any, room: any) {
         var player=this.players[id];
         //console.log("Update player",player.index, cmd.type);
+        let lapTime = (new Date()).getTime() - this.turnLap;
+        let turnTime = 0;
+        if (lapTime>500 && this.turnStart>0){
+            this.turnLap=(new Date()).getTime();
+            turnTime = (new Date()).getTime() - this.turnStart;
+            //console.log("turn",lapTime, turnTime);
+            this.ui.timer.label=(""+Math.round(turnTime/1000));
+            this.ui.timer.fontColor="#fff";
+            if (turnTime>40000){
+                this.ui.timer.fontColor="#ff4";
+            }
+            if (turnTime>50000){
+                this.ui.timer.fontColor="#f44";
+            }
+        }
+        this.ui.timer.visible=(this.currentId!='');
         if (cmd.idle==1){
             return;
         }
@@ -499,14 +534,17 @@ export class ExampleState extends State {
             clearTimeout(this.timeout1);
             clearTimeout(this.timeout2);
             clearTimeout(this.timeout3);
+            clearTimeout(this.timeout4);
         }
         this.timeout1 = null;
         this.timeout2 = null;
         this.timeout3 = null;
+        this.timeout4 = null;
     }
 
     nextTurn(id: string){
-        this.turnTime = new Date();
+        this.turnStart = (new Date()).getTime();
+        this.turnLap = this.turnStart;
         this.playerPoints = 100;
         this.drawerPoints = 50;
         if (this.ui.win){
@@ -539,10 +577,10 @@ export class ExampleState extends State {
                 this.ui['clue'].visible = true;
                 this.playerPoints-=20;
                 this.drawerPoints-=5;
-            },30000)
+            },10000)
             this.timeout2 = setTimeout(()=>{
                 let word1 = this.ui['clue'].label;
-                let index = Math.round(this.word.length-1/2);
+                let index = Math.round((this.word.length-1)/2);
                 let replacement = this.word.charAt(index);
                 index*=2;
                 word1 = word1.substring(0, index) + replacement + word1.substring(index + 1)
@@ -550,7 +588,7 @@ export class ExampleState extends State {
                 this.ui['clue'].visible = true;
                 this.playerPoints-=10;
                 this.drawerPoints-=10;
-            },40000)
+            },20000)
             this.timeout3 = setTimeout(()=>{
                 if (this.word.length>4){
                     let word1 = this.ui['clue'].label;
@@ -564,6 +602,13 @@ export class ExampleState extends State {
                     this.drawerPoints-=10;
                 }
             },50000)
+            this.timeout4 = setTimeout(()=>{
+                let word1 = this.word.replace(/(.)/g,'$1 ');
+                this.ui['clue'].label = word1;
+                this.ui['clue'].visible = true;
+                this.playerPoints=10;    
+                this.drawerPoints=0;
+            },60000)
         }
     }
 

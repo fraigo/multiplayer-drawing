@@ -251,6 +251,9 @@ function drawObject(ctx,object,dx,dy){
   }
   if (object.label){
     ctx.fillStyle = "#000";
+    if (object.fontColor && object.fontColor!=""){
+      ctx.fillStyle = object.fontColor;
+    }
     ctx.font = object.fontSize + "px Arial";
     ctx.textAlign = object.labelAlign?object.labelAlign:'center';
     var lx=object.labelx?object.labelx:0;

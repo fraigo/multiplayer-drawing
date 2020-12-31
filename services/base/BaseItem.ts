@@ -64,6 +64,9 @@ export class BaseItem extends Schema {
     @type("number")
     fontSize = 24;
 
+    @type("string")
+    fontColor = "";
+
     @type("boolean")
     visible = true;
 

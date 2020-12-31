@@ -455,7 +455,7 @@ export class ExampleState extends State {
                             selCard.bgcolor="#ffc";
                             //console.log('upd',selCard.label,selCard.bgcolor);
                             selword+=selCard.label;
-                            console.log('SELWORD',selword,this.word);
+                            //console.log('SELWORD',selword,this.word);
                             if (selword==this.word){
                                 let currentPlayer = this.players[this.currentId];
                                 currentPlayer.score+=this.drawerPoints;

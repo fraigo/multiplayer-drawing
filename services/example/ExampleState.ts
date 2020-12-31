@@ -577,7 +577,7 @@ export class ExampleState extends State {
                 this.ui['clue'].visible = true;
                 this.playerPoints-=20;
                 this.drawerPoints-=5;
-            },10000)
+            },30000)
             this.timeout2 = setTimeout(()=>{
                 let word1 = this.ui['clue'].label;
                 let index = Math.round((this.word.length-1)/2);
@@ -588,7 +588,7 @@ export class ExampleState extends State {
                 this.ui['clue'].visible = true;
                 this.playerPoints-=10;
                 this.drawerPoints-=10;
-            },20000)
+            },40000)
             this.timeout3 = setTimeout(()=>{
                 if (this.word.length>4){
                     let word1 = this.ui['clue'].label;

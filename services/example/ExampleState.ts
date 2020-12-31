@@ -142,7 +142,7 @@ export class ExampleState extends State {
                 height: 40,
                 borderRadius: 8,
                 label: "",
-                bgcolor: "#fff8",
+                bgcolor: "#fff",
                 type: 'clue',
                 fontSize: 36,
                 visible: false,
@@ -156,7 +156,7 @@ export class ExampleState extends State {
                 height: 80,
                 borderRadius: 40,
                 label: "60",
-                bgcolor: "#000A",
+                bgcolor: "#000",
                 type: 'timer',
                 fontSize: 30,
                 fontColor: "#fff",
@@ -466,7 +466,7 @@ export class ExampleState extends State {
                                 console.log("CHECK",this.selectedWords.length,this.words[this.lang].length);
                                 let moreWords=this.selectedWords.length!=this.words[this.lang].length;
                                 if (moreWords && player.score<this.maxScore && currentPlayer.score<this.maxScore){
-                                    this.square('win',300,380,400,220,"#fffc",20,player.name+" "+this.language[this.lang].wins);
+                                    this.square('win',300,380,400,220,"#fff",20,player.name+" "+this.language[this.lang].wins);
                                     this.ui['win'].stroke='#ccc';
                                     this.square('word',400,410,200,40,"#ff0",14,this.word);
                                         player.privateItems['myturn']=this.item({

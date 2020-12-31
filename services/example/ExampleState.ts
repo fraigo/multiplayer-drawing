@@ -117,7 +117,7 @@ export class ExampleState extends State {
     }
 
     finishGame(player){
-        this.square('win',300,380,400,220,"#fffc",20,player.name+" "+player.score+" points");
+        this.square('win',300,380,400,220,"#fff",20,player.name+" "+player.score+" points");
         this.ui['win'].stroke='#ccc';
         this.ui['finish']=this.item({
             type:'finish',

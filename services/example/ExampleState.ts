@@ -46,7 +46,7 @@ export class ExampleState extends State {
     realLetters : Array<string> = [];
     words : any = new Words();
     language : any = new Lang();
-    lang : string = "en";
+    lang : string = "";
     turnStart : number = 0;
     turnLap : number = 0;
     timeout1 : NodeJS.Timeout = null;
@@ -255,22 +255,21 @@ export class ExampleState extends State {
     }    
     
     initPlayer (player: ExamplePlayer){
-        if (this.word==null){
+        if (this.lang==""){
             this.lang = player.lang;
-            if (!this.ui.waiting){
-                this.ui['waiting']=this.item({
-                    x:500,
-                    y:750,
-                    width: 400,
-                    height: 40,
-                    borderRadius: 8,
-                    label: this.language[this.lang].waiting_players,
-                    bgcolor: "#ff8",
-                    type: 'clue',
-                    fontSize: 32,
-                });
-            }
-    
+        }
+        if (!this.ui.waiting){
+            this.ui['waiting']=this.item({
+                x:500,
+                y:750,
+                width: 400,
+                height: 40,
+                borderRadius: 8,
+                label: this.language[this.lang].waiting_players,
+                bgcolor: "#ff8",
+                type: 'clue',
+                fontSize: 32,
+            });
         }
         console.log("Init player");
         var item=new BaseItem();

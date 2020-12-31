@@ -509,10 +509,19 @@ export class ExampleState extends State {
         this.turnTime = new Date();
         this.playerPoints = 100;
         this.drawerPoints = 50;
+        if (this.ui.win){
+            delete this.ui.win;
+        }
+        if (this.ui.word){
+            delete this.ui.word;
+        }
         this.resetDrawing();
         if (this.nextWord()){
             let idx: any;
             for(idx in this.players){
+                if (this.players[idx].privateItems['myturn']){
+                    delete this.players[idx].privateItems['myturn'];
+                }
                 this.resetPlayer(this.players[idx]);
                 this.setupPlayer(this.players[idx]);
             }
@@ -693,6 +702,7 @@ export class ExampleState extends State {
                 for(var idp in this.players){
                     this.resetPlayer(this.players[idp]);
                 }
+                this.ui['waiting'].visible = true;
             }
         }
     }

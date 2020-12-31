@@ -799,7 +799,7 @@ return e[t]}
 if("length"!==t&&"$changes"!==t){
 var r=a?Number(t):String(t),i=e.$changes.getIndex(n);void 0!==i&&e.$changes.mapIndexChange(n,i),e.$changes.mapIndex(n,r),n instanceof s.Schema?n.$changes.parent||(n.$changes=new o.ChangeTree(r,e.$changes),n.$changes.changeAll(n)):e[t]=n,e.$changes.change(r)}
 else e[t];return e[t]=n,!0}
-,deleteProperty:function(e,t){e[t];delete e[t];var n=a?Number(t):String(t);return e.$changes.change(n,!0),!0}
+//,deleteProperty:function(e,t){e[t];delete e[t];var n=a?Number(t):String(t);return e.$changes.change(n,!0),!0}
 }
 )),e!==this[c])if(this[c]=e,Array.isArray(i._schema[r])){
 this.$changes.change(r),e.$changes=new o.ChangeTree(r,this.$changes);for(var t=0;t<e.length;t++)e[t]instanceof s.Schema&&(e[t].$changes=new o.ChangeTree(t,e.$changes),e[t].$changes.changeAll(e[t])),e.$changes.mapIndex(e[t],t),e.$changes.change(t)}

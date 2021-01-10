@@ -29,7 +29,8 @@ export class State extends GameState {
     last_time = this.time;
     diff = 0;
     
-    createPlayer (id: string, name: string, lang: string, client: any) {
+    createPlayer (id: string, name: string, lang: string, client: any, maxClients: number) {
+        this.maxPlayers = maxClients;
         if (this.state == this.STATE_FINISH){
             return;
         }

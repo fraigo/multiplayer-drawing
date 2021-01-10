@@ -15,7 +15,6 @@ export class BaseRoom<T = State> extends Room<T> {
     playerName = "";
     playerLang = "en";
 
-    maxClients = 4;
 
     @type(State)
     state = null;
@@ -37,20 +36,22 @@ export class BaseRoom<T = State> extends Room<T> {
     onJoin (client) {
         var name=this.playerName+"";
         var lang=this.playerLang;
-        console.log("Player",client.sessionId,name);
-        this.state.createPlayer(client.sessionId, name, lang, client);
+        console.log("Joined Player",client.sessionId,name);
+        this.state.createPlayer(client.sessionId, name, lang, client, this.maxClients);
     }
 
     requestJoin (options, isNewRoom: boolean) {
-        console.log("requestJoin",options.id,this.roomId,options.name);
+        console.log("requestJoin",options.id,this.roomId,options.name, this.maxClients);
         if (options.id && options.id!=this.roomId){
             return false;
         }
         this.playerName = options.name;
         this.playerLang = options.lang;
-        return (options.create)
+        let result = (options.create)
             ? (options.create && isNewRoom)
             : this.clients.length > 0 && this.metadata.opened;
+        console.log("requestJoin result",result);
+        return result;
     }
 
     onLeave (client) {

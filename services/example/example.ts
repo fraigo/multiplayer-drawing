@@ -7,9 +7,9 @@ import { BaseRoom } from "../base/BaseRoom";
 
 export class ExampleRoom extends BaseRoom<ExampleState> {
     
-    maxClients = 6;
 
     start(){
+        this.maxClients = 8;
         console.log("Started");
         this.setState(new ExampleState());   
     }

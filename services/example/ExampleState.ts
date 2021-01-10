@@ -17,7 +17,12 @@ export class ExampleState extends State {
         "#00c",
         "#c0c",
         "#0cc",
-        "#8c0"
+        "#8c0",
+        "#c88",
+        "#8c8",
+        "#88c",
+        "#c8c",
+        "#8cc"
     ]
 
     palette = [
@@ -56,6 +61,7 @@ export class ExampleState extends State {
     playerPoints : number = 0;
     drawerPoints : number = 0;
     selectedWords : Array<string> = [];
+    drawCount: number = 0;
 
     startTime : number = 0;
     maxScore = 1000;
@@ -393,7 +399,7 @@ export class ExampleState extends State {
                 this.drawItem(cmd.px,cmd.py,player);
                 player.x0=cmd.px;
                 player.y0=cmd.py;
-                    
+                this.drawCount++;
             }
             if (cmd.type=="drag"){
                 if (player.x0>=0){
@@ -420,6 +426,7 @@ export class ExampleState extends State {
                     item.points["p1"]=p1;
     
                     this.items[item.id]=item;
+                    this.drawCount++;
                 }
 
             }
@@ -429,6 +436,7 @@ export class ExampleState extends State {
                     this.drawItem(cmd.px,cmd.py,player);   
                 }
                 player.x0=-1;
+                this.drawCount++;
             }
         }else if(this.currentId!=''){
             if (cmd.type=="release"){
@@ -546,6 +554,7 @@ export class ExampleState extends State {
         this.turnLap = this.turnStart;
         this.playerPoints = 100;
         this.drawerPoints = 50;
+        this.drawCount = 0;
         if (this.ui.win){
             delete this.ui.win;
         }
@@ -607,7 +616,7 @@ export class ExampleState extends State {
                 this.ui['clue'].visible = true;
                 this.playerPoints=10;    
                 this.drawerPoints=0;
-            },60000)
+            },70000)
         }
     }
 
@@ -697,6 +706,7 @@ export class ExampleState extends State {
 
     updatePlayerUi(){
         var idx=0;
+        //console.log("update players",Object.keys(this.players));
         for(var p in this.players){
             var pl = this.players[p];
             var plui = this.ui["player"+pl.UUID];
@@ -709,9 +719,9 @@ export class ExampleState extends State {
         if (this.currentId!=''){
             var player = this.getPlayer(this.currentId);
             if (player){
-                if (Math.random()*10>7){
+                if (this.drawCount%4==0){
                     this.ui["player"+player.UUID].label+=" ✎";
-                } else if (Math.random()*10<4){
+                } else if (this.drawCount%4==1){
                     this.ui["player"+player.UUID].label+=" ✏︎";
                 }else{
                     this.ui["player"+player.UUID].label+=" ✎.";

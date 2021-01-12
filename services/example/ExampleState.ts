@@ -83,7 +83,7 @@ export class ExampleState extends State {
     
     getLetters(word: string): Array<string>{
         let altLetters = "aeioucdglmnprst".split("");
-        let wordLetters : Array<string> = word.split("");
+        let wordLetters : Array<string> = word.replace(" ","").split("");
         let wordUniqueLetters : Array<string> = wordLetters.filter((item, pos) => wordLetters.indexOf(item) == pos);
         let allLetters: Array<string> = wordUniqueLetters.concat(altLetters);
         let letters : Array<string> = allLetters.filter((item, pos) => allLetters.indexOf(item) == pos);
@@ -251,10 +251,11 @@ export class ExampleState extends State {
                 height: 80,
                 borderRadius: 8,
                 bgcolor: '#fff',
-                label: "_",
+                label: this.realLetters[idx]==' '?" ":"_",
                 type: 'temp',
                 fontSize: 40,
-                stroke: '#eee'
+                stroke: '#eee',
+                visible: this.realLetters[idx]!=' '
             })
         }
 
@@ -457,13 +458,16 @@ export class ExampleState extends State {
                     for(index=0; index<this.word.length; index++){
                         const selCard=player.privateItems["mysel"+index];
                         selCard.bgcolor="#ffe";
-                        //console.log("mysel"+index,selCard.label,selCard.x);
+                        console.log("mysel"+index,selCard.label,selCard.x);
+                        if (selCard.label==" "){
+                            selword+=selCard.label;
+                            continue;
+                        }
                         if (selCard.label=="_"){
                             selCard.label=selectedItem.label;
                             selCard.bgcolor="#ffc";
                             //console.log('upd',selCard.label,selCard.bgcolor);
                             selword+=selCard.label;
-                            //console.log('SELWORD',selword,this.word);
                             if (selword==this.word){
                                 let currentPlayer = this.players[this.currentId];
                                 currentPlayer.score+=this.drawerPoints;
@@ -501,19 +505,27 @@ export class ExampleState extends State {
                         }else{
                             selword+=selCard.label;
                         }
+                        console.log('SELWORD',selword,this.word);
                     }
                 }
                 let backButton : BaseItem = player.privateItems["back"];
                 if (!selectedItem && backButton){
                     if (backButton.collisionWithPoint(cmd.px,cmd.py)){
-                        console.log("press back");
                         let nextKey = "mysel0";
                         for(index=0; index<this.word.length; index++){
-                            if (player.privateItems['mysel'+index].label=="_" || idx=='back'){
+                            if (player.privateItems['mysel'+index].label=="_"){
+                                if (player.privateItems['mysel'+(index-1)].label==" "){
+                                    nextKey = 'mysel'+(index-2);
+                                    break;     
+                                }
+                                break;
+                            }
+                            if(idx=="back"){
                                 break;
                             }
                             nextKey = 'mysel'+index;
                         }
+                        console.log("press back",idx,nextKey);
                         player.privateItems[nextKey].label='_';
                         player.privateItems[nextKey].bgcolor='#fff';
                     }

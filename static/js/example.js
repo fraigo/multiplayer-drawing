@@ -361,7 +361,7 @@ function joinRoom(room){
       if (item.type=='finish'){
         setTimeout(function(){
           document.location='./';
-        },3000);
+        },5000);
       }
       ui.push(item);
       triggerDraw();

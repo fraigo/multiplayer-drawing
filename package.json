@@ -6,7 +6,9 @@
   "scripts": {
     "start": "nodemon --watch '**/*.ts' --exec ts-node index.ts",
     "heroku-postbuild": "npm run build",
-    "patch": "npm version patch && git describe --tags --abbrev=0 > static/version.txt"
+    "patch": "npm version patch && git describe --tags --abbrev=0 > static/version.txt",
+    "clean": "rm -rf ./lib",
+    "pack" : "cp -r static ./lib && zip -r app.zip lib/*"
   },
   "engines": {
     "node": "8.9.1"

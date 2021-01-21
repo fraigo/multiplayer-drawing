@@ -58,6 +58,7 @@ export class ExampleState extends State {
     timeout2 : NodeJS.Timeout = null;
     timeout3 : NodeJS.Timeout = null;
     timeout4 : NodeJS.Timeout = null;
+    myTurnTimeout : NodeJS.Timeout = null;
     playerPoints : number = 0;
     drawerPoints : number = 0;
     selectedWords : Array<string> = [];
@@ -491,6 +492,9 @@ export class ExampleState extends State {
                                         fontSize: 40,
                                         borderRadius: 10,
                                     })
+                                    this.myTurnTimeout=setTimeout(() => {
+                                        this.startMyTurn(player, id);
+                                    },5000);
                                 }else{
                                     room.metadata.opened=false;
                                     if (!moreWords || player.score>=this.maxScore){
@@ -536,16 +540,21 @@ export class ExampleState extends State {
             let myTurn : BaseItem = player.privateItems["myturn"];
             if (myTurn){
                 if (myTurn.collisionWithPoint(cmd.px,cmd.py)){
-                    delete player.privateItems.myturn;
-                    delete this.ui.win;
-                    delete this.ui.word;
-                    setTimeout(()=>{
-                        this.nextTurn(id);
-                    },500);
+                    clearTimeout(this.myTurnTimeout);
+                    this.startMyTurn(player, id);
                     return;
                 }
             }
         }
+    }
+
+    startMyTurn(player, id){
+        delete player.privateItems.myturn;
+        delete this.ui.win;
+        delete this.ui.word;
+        setTimeout(()=>{
+            this.nextTurn(id);
+        },500);
     }
 
     stopClues(){
@@ -563,6 +572,7 @@ export class ExampleState extends State {
 
     nextTurn(id: string){
         this.turnStart = (new Date()).getTime();
+        clearTimeout(this.myTurnTimeout);
         this.turnLap = this.turnStart;
         this.playerPoints = 100;
         this.drawerPoints = 50;

@@ -518,7 +518,8 @@ export class ExampleState extends State {
                         let nextKey = "mysel0";
                         for(index=0; index<this.word.length; index++){
                             if (player.privateItems['mysel'+index].label=="_"){
-                                if (player.privateItems['mysel'+(index-1)].label==" "){
+                                let item = player.privateItems['mysel'+index]
+                                if (item && item.label==" "){
                                     nextKey = 'mysel'+(index-2);
                                     break;     
                                 }
